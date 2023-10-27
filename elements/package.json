@@ -3,22 +3,25 @@
   "version": "0.0.1",
   "description": "Synagogue Web Components",
   "type": "module",
+  "author": "Benny Powers <web@bennypowers.com>",
+  "license": "GPL-3.0",
   "scripts": {
     "test": "echo 'no tests yet'"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "**/*.d.ts",
+    "**/*.js",
+    "**/*.map"
+  ],
   "keywords": [
     "shul",
     "synagogue",
     "jewish",
     "web components"
   ],
-  "files": [
-    "**/*.d.ts",
-    "**/*.js",
-    "**/*.map"
-  ],
-  "author": "Benny Powers <web@bennypowers.com>",
-  "license": "GPL-3.0",
   "dependencies": {
     "@hebcal/core": "^4.4.1",
     "@lit/context": "^1.0.0",
