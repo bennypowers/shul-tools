@@ -239,6 +239,7 @@ export class HebCalChild extends LitElement {
       dl {
         display: grid;
         grid-template-columns: max-content auto;
+        align-items: end;
       }
 
       dl > div {
@@ -247,8 +248,8 @@ export class HebCalChild extends LitElement {
       }
 
       dt {
-        font-family: sans;
-        text-align: left;
+        font-family: sans-serif;
+        justify-self: end;
       }
 
       dd {
