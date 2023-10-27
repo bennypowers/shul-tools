@@ -1,0 +1,23 @@
+{
+  "name": "@shul/elements",
+  "version": "0.0.1",
+  "description": "Synagogue Web Components",
+  "type": "module",
+  "scripts": {
+    "test": "echo 'no tests yet'"
+  },
+  "keywords": [
+    "shul",
+    "synagogue",
+    "jewish",
+    "web components"
+  ],
+  "author": "Benny Powers <web@bennypowers.com>",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@hebcal/core": "^4.4.1",
+    "@lit/context": "^1.0.0",
+    "lit": "^3.0.0",
+    "tslib": "^2.6.2"
+  }
+}
