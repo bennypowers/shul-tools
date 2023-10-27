@@ -140,7 +140,7 @@ export class HebCal extends LitElement {
   }
 
   @provide({ context: hebCalContext })
-  accessor context = this;
+  protected accessor context = this;
 
   connectedCallback() {
     super.connectedCallback();
@@ -158,8 +158,8 @@ export class HebCal extends LitElement {
       .find(x => x.type === "timeZoneName")?.value??'';
     return html`
       <time part="now" datetime="${this.now.toISOString()}">
-        ${this.now.toLocaleTimeString(locale, { timeStyle: 'medium' })},
-        ${this.hDate?.render(locale)}
+        <strong class="time">${this.now.toLocaleTimeString(locale, { timeStyle: 'medium' })},</strong>
+        <span class="date">${this.hDate?.render(locale)}</span>
         <small>${timeZoneName}</small>
       </time>
       <slot></slot>
