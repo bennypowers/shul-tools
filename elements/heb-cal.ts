@@ -94,7 +94,6 @@ export class HebCal extends LitElement {
   @property()
   accessor city = 'Jerusalem';
 
-
   @property({ type: Number, attribute: 'tzeit-angle' })
   accessor tzeitAngle = 7.083;
 
@@ -141,7 +140,7 @@ export class HebCal extends LitElement {
   }
 
   @provide({ context: hebCalContext })
-  accessor #context = this;
+  accessor context = this;
 
   connectedCallback() {
     super.connectedCallback();
