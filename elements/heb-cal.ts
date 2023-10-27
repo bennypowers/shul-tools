@@ -1,7 +1,15 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { HDate, HebrewCalendar, Location, Zmanim, Event as HebCalEvent, flags } from '@hebcal/core';
+import {
+  HDate,
+  HebrewCalendar,
+  Location,
+  Zmanim,
+  Event as HebCalEvent,
+  flags,
+} from '@hebcal/core';
+
 import { consume, createContext, provide } from '@lit/context';
 
 const ZMANIM_KEYS = [
@@ -193,7 +201,7 @@ export class HebCal extends LitElement {
   #getEvents(): HebCalEvent[] {
     const start = this.now;
     const end = new Date(start)
-    end.setDate(start.getDate() + 1);
+          end.setDate(start.getDate() + 1);
     return HebrewCalendar.calendar({
       location: this.#location,
       start,
@@ -202,6 +210,17 @@ export class HebCal extends LitElement {
       candleLightingMins: 40,
       havdalahDeg: this.tzeitAngle,
       il: this.locale.endsWith('IL'),
+      locale: this.locale.match(/^(he|en)$/) ? this.locale : 'he',
+      sedrot: true,
+      omer: true,
+      shabbatMevarchim: true,
+      molad: true,
+      yomKippurKatan: true,
+      dailyLearning: {
+        dafYomi: true,
+        yerushalmi: 2,
+        mishnaYomi: true,
+      }
     });
   }
 
@@ -238,9 +257,14 @@ export class HebCalChild extends LitElement {
 
       dl {
         display: grid;
-        grid-template-columns: max-content auto;
+        grid-template-columns: auto;
         align-items: end;
+        gap: 0.5em;
+        @media (min-width: 400px) {
+          grid-template-columns: max-content auto;
+        }
       }
+
 
       dl > div {
         display: contents;
@@ -249,10 +273,14 @@ export class HebCalChild extends LitElement {
 
       dt {
         font-family: sans-serif;
-        justify-self: end;
+        justify-self: start;
+        @media (min-width: 400px) {
+          justify-self: end;
+        }
       }
 
       dd {
+        margin: 0;
         font-family: sans-serif;
         font-weight: bold;
       }
