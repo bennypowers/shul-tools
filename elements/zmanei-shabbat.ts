@@ -1,31 +1,20 @@
-import { css, html } from 'lit';
+import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 import { HebCalChild } from './heb-cal.js';
 
+import style from './zmanei-shabbat.css';
+
 @customElement('zmanei-shabbat')
 export class ZmaneiShabbat extends HebCalChild {
-  static styles = [
+  static readonly styles = [
     ...HebCalChild.styles,
-    css`
-      #events {
-        font-size: 200%;
-      }
-
-      .term {
-        display: flex;
-        gap: .5em;
-      }
-
-      .emoji {
-        margin-inline-start: auto;
-      }
-    `,
+    style
   ]
 
   render() {
-    if (this.hebcal.events?.length) {
+    if (this.hebcal?.events?.length) {
       const { i18n, isChag, isErevChag, isShabbat, isErevShabbat } = this.hebcal;
       const locale = this.hebcal.locale.substring(0, 1);
       console.log(this.hebcal.events.flatMap(x => x.getCategories()))

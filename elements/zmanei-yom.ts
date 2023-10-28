@@ -6,14 +6,14 @@ import { classMap } from 'lit/directives/class-map.js';
 @customElement('zmanei-yom')
 export class ZmaneiYom extends HebCalChild {
   render() {
-    const { dailyZmanim, i18n, locale, tzeitAngle } = this.hebcal;
+    const { dailyZmanim, i18n, locale, tzeitAngle } = this.hebcal ?? {};
     return html`
       <slot>
         <h2>
-          ${i18n.zmanei} ${i18n.yom}
+          ${i18n?.zmanei ?? ''} ${i18n?.yom ?? ''}
         </h2>
       </slot>
-      <dl>${dailyZmanim.map(({ key, date, past, next }) => html`
+      <dl>${dailyZmanim?.map(({ key, date, past, next }) => html`
         <div class="${classMap({ past, next })}">
           <dt part="list term">
             <span>${i18n[key]}</span>${key !== 'tzeit' ? '' : html`
@@ -26,6 +26,7 @@ export class ZmaneiYom extends HebCalChild {
           </dd>
         </div>`)}
       </dl>
+      <slot name="footer"></slot>
     `;
   }
 }

@@ -5,6 +5,14 @@
     "module": "NodeNext",
     "declaration": true,
     "moduleResolution": "NodeNext",
-    "sourceMap": true
+    "importHelpers": true,
+    "sourceMap": true,
+    "plugins": [
+      {
+        "transform": "typescript-transform-lit-css",
+        "inline": true,
+        // "uglify": true
+      }
+    ]
   }
 }

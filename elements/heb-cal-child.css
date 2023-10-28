@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: auto;
+  align-items: end;
+  gap: 0.5em;
+  @media (min-width: 400px) {
+    grid-template-columns: max-content auto;
+  }
+}
+
+dl > div {
+  display: contents;
+  font-size: var(--size, initial);
+}
+
+dt {
+  font-family: sans-serif;
+  justify-self: start;
+  @media (min-width: 400px) {
+    justify-self: end;
+  }
+}
+
+dd {
+  margin: 0;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+
+.past :is(dt, dd) {
+  opacity: 0.5;
+}
+
+.next {
+  --size: 120%;
+}

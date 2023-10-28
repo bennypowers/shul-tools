@@ -1,0 +1,12 @@
+#events {
+  font-size: 200%;
+}
+
+.term {
+  display: flex;
+  gap: .5em;
+}
+
+.emoji {
+  margin-inline-start: auto;
+}

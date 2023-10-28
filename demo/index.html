@@ -11,6 +11,7 @@
       },
       "scopes": {
         "../": {
+          "tslib": "../node_modules/tslib/tslib.es6.js",
           "lit": "../node_modules/lit/index.js",
           "lit-html": "../node_modules/lit-html/lit-html.js",
           "lit-html/": "../node_modules/lit-html/",
@@ -26,16 +27,18 @@
     </script>
     <script type="module">
       import '@shul/elements/heb-cal.js';
+      import '@shul/elements/daf-yomi.js';
       import '@shul/elements/zmanei-shabbat.js';
       import '@shul/elements/zmanei-yom.js';
     </script>
   </head>
   <body>
     <main>
-       <heb-cal city="Jerusalem"
+      <heb-cal city="Jerusalem"
                candles-minutes-before-sundown="40">
         <zmanei-shabbat></zmanei-shabbat>
         <zmanei-yom></zmanei-yom>
+        <daf-yomi></daf-yomi>
       </heb-cal>
     </main>
   </body>
