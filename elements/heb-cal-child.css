@@ -6,7 +6,7 @@ dl {
   display: grid;
   grid-template-columns: auto;
   align-items: end;
-  gap: 0.5em;
+  gap: 0.25em;
   @media (min-width: 400px) {
     grid-template-columns: max-content auto;
   }
