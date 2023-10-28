@@ -28,7 +28,6 @@
     "eslint": "^8.52.0",
     "ts-patch": "^3.0.2",
     "tslib": "^2.6.2",
-    "typescript": "^5.2.2",
-    "typescript-transform-lit-css": "^1.0.0"
+    "typescript": "^5.2.2"
   }
 }
