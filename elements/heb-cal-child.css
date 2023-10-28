@@ -14,7 +14,7 @@ dl {
 
 dl > div {
   display: contents;
-  font-size: var(--size, initial);
+  font-size: var(--size);
 }
 
 dt {
