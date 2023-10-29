@@ -1,6 +1,6 @@
 {
   "name": "@shul/elements",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Synagogue Web Components",
   "type": "module",
   "main": "elements.js",
