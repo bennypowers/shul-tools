@@ -6,7 +6,7 @@ import style from './zmanei-tefillah.css';
 
 @customElement('zmanei-tefillah')
 export class ZmaneiTefillah extends HebCalChild {
-  static readonly styles = [style];
+  static readonly styles = [...HebCalChild.styles, style];
 
   #mo = new MutationObserver(() => this.#update());
 

@@ -3,7 +3,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import { consume, createContext, provide } from '@lit/context';
 
-import { HebCal, type I18nKeys } from './HebCal.js';
+import { HebCal } from './HebCal.js';
+
+import sharedStyles from './shared.css'
 
 import styles from './heb-cal.css';
 
@@ -13,7 +15,7 @@ const context = createContext<HebCal>('hebcal');
 
 @customElement('heb-cal')
 export class HebCalElement extends LitElement {
-  static styles = [styles];
+  static styles = [sharedStyles, styles];
 
   @property()
   accessor locale = 'he-IL'
@@ -45,18 +47,31 @@ export class HebCalElement extends LitElement {
     setInterval(this.#refresh, 1000);
   }
 
+  static #findPart(parts: Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPart['type']) {
+    return parts.find(x => x.type === type)?.value ?? '';
+  }
+
   render() {
-    const { date: now, hDate: today, locale } = this.#hebcal;
-    const locale2Digit = locale.substring(0, 2);
-    const timeZoneName = new Intl.DateTimeFormat(locale, { timeZoneName: 'long' })
-      .formatToParts(now)
-      .find(x => x.type === 'timeZoneName')?.value ?? '';
+    const { date, locale } = this.#hebcal;
+    const parts = new Intl.DateTimeFormat(locale, { timeZoneName: 'long', hour: '2-digit', minute: '2-digit', second: '2-digit' }).formatToParts(date);
+    const hour = HebCalElement.#findPart(parts, 'hour');
+    const minute = HebCalElement.#findPart(parts, 'minute');
+    const second = HebCalElement.#findPart(parts, 'second');
+    const timeZoneName = HebCalElement.#findPart(parts, 'timeZoneName');
+
     return html`
-      <time part="now" datetime="${now.toISOString()}">
-        <strong class="time">${now.toLocaleTimeString(locale, { timeStyle: 'medium' })},</strong>
-        <span class="date">${today?.render(locale2Digit)}</span>
-        <small>${timeZoneName}</small>
+      <time part="today"
+            datetime="${date.toISOString()}">
+        <strong part="time">
+          <span part="hour">${hour}</span>
+          <span part="colon">:</span>
+          <span part="minute">${minute}</span>
+          <span part="colon">:</span>
+          <span part="second">${second}</span>
+        </strong>
+        <small part="time-zone">${timeZoneName}</small>
       </time>
+
       <slot></slot>
     `;
   }
@@ -66,17 +81,16 @@ export class HebCalElement extends LitElement {
   #getHebcal() {
     const { city, longitude, latitude, locale, tzeitAngle } = this;
     return new HebCal({
-      city,
-      locale,
-      latitude,
-      longitude,
+      city, locale,
+      latitude, longitude,
       tzeitAngle,
     });
   }
 }
 
 export class HebCalChild extends LitElement {
-  static styles = [childStyles];
-  @consume({ context: context }) accessor hebcal: HebCal;
+  static styles = [sharedStyles, childStyles];
+
+  @consume({ context }) accessor hebcal: HebCal;
 }
 

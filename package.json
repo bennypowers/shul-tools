@@ -9,13 +9,37 @@
   "license": "GPL-3.0",
   "scripts": {
     "test": "echo 'no tests yet'",
-    "publish": "tspc && npm publish -ws"
+    "start": "wireit",
+    "publish": "wireit",
+    "build": "wireit"
   },
   "keywords": [
     "shul",
     "synagogue",
     "jewish"
   ],
+  "wireit": {
+    "start": {
+      "command": "wds --watch",
+      "service": true,
+      "dependencies": [
+        "watch"
+      ]
+    },
+    "watch": {
+      "command": "tspc -w",
+      "service": true
+    },
+    "build": {
+      "command": "tspc"
+    },
+    "publish": {
+      "command": "npm publish -ws",
+      "dependencies": [
+        "build"
+      ]
+    }
+  },
   "workspaces": [
     "elements"
   ],
@@ -29,6 +53,7 @@
     "ts-patch": "^3.0.2",
     "tslib": "^2.6.2",
     "typescript": "^5.2.2",
-    "typescript-transform-lit-css": "^1.0.0"
+    "typescript-transform-lit-css": "^1.0.0",
+    "wireit": "^0.14.1"
   }
 }

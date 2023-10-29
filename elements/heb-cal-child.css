@@ -1,5 +1,7 @@
-:host {
-  display: block;
+heading {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
 }
 
 dl {
@@ -7,6 +9,7 @@ dl {
   grid-template-columns: auto;
   align-items: end;
   gap: 0.25em;
+  margin: 0;
   @media (min-width: 400px) {
     grid-template-columns: max-content auto;
   }
@@ -18,7 +21,6 @@ dl > div {
 }
 
 dt {
-  font-family: sans-serif;
   justify-self: start;
   @media (min-width: 400px) {
     justify-self: end;
@@ -27,7 +29,6 @@ dt {
 
 dd {
   margin: 0;
-  font-family: sans-serif;
   font-weight: bold;
 }
 

@@ -1,3 +1,28 @@
 time {
+  display: inline-flex;
+  flex-wrap: wrap;
+  float: inline-end;
+  margin: .6em;
+}
+
+[part="today"] {
+	display: grid;
+	align-items: center;
+	background: white;
+	padding: 0.6em;
+	border-radius: 5px;
+	border: 4px solid black;
+	justify-content: center;
+	text-align: center;
+}
+
+[part="time"] {
+  display: flex;
+  align-items: center;
   font-family: monospace;
+  font-size: 200%;
+}
+
+[part="time"] > * {
+  display: block;
 }
