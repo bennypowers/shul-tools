@@ -162,22 +162,19 @@ export class HebCal {
   }
 
   #getLocation() {
-    const cityLookup = Location.lookup(this.city);
-    const { il, tzid, cc } = cityLookup
+    const found = Location.lookup(this.city);
     if (this.latitude && this.longitude)
-      /**
-       * Initialize a Location instance
-       * @param {number} latitude - Latitude as a decimal, valid range -90 thru +90 (e.g. 41.85003)
-       * @param {number} longitude - Longitude as a decimal, valid range -180 thru +180 (e.g. -87.65005)
-       * @param {boolean} il - in Israel (true) or Diaspora (false)
-       * @param {string} tzid - Olson timezone ID, e.g. "America/Chicago"
-       * @param {string} cityName - optional descriptive city name
-       * @param {string} countryCode - ISO 3166 alpha-2 country code (e.g. "FR")
-       * @param {string} geoid - optional string or numeric geographic ID
-       */
-      return new Location(this.latitude, this.longitude, il, tzid, this.city, cc);
+      return new Location(
+        this.latitude,
+        this.longitude,
+        found?.getIsrael(),
+        found?.getTzid(),
+        found?.getName(),
+        found?.getCountryCode(),
+        found?.getGeoId(),
+      );
     else
-      return cityLookup
+      return found
   }
 
   #getZmanim(): Zmanim {
