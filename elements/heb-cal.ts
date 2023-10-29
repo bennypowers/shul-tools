@@ -62,7 +62,7 @@ export class HebCalElement extends LitElement {
     return html`
       <time part="today"
             datetime="${date.toISOString()}">
-        <strong part="time">
+        <strong part="time" dir="ltr">
           <span part="hour">${hour}</span>
           <span part="colon">:</span>
           <span part="minute">${minute}</span>

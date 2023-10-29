@@ -22,9 +22,6 @@ dl > div {
 
 dt {
   justify-self: start;
-  @media (min-width: 400px) {
-    justify-self: end;
-  }
 }
 
 dd {
