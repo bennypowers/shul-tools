@@ -3,5 +3,6 @@ node_modules
 elements/*.js
 elements/*.d.ts
 elements/*.js.map
+!elements/css.d.ts
 
 *.tgz
