@@ -1,10 +1,12 @@
 :host {
-  display: grid;
-  grid-template-columns: auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: end;
+  justify-content: center;
   gap: 0.25em;
-  @media (min-width: 400px) {
-    grid-template-columns: max-content auto;
-  }
+}
+
+heading {
+  width: 100%;
 }
 

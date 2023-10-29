@@ -22,7 +22,7 @@ export class ZmaneiTefillah extends HebCalChild {
 
   render() {
     return html`
-      <h2>${this.hebcal?.i18n?.zmaneiTefillah ?? ''}</h2>
+      <h2 id="heading">${this.hebcal?.i18n?.zmaneiTefillah ?? ''}</h2>
       <slot name="weekday"    ?hidden="${!this.hebcal.isWeekday}"></slot>
       <slot name="shabbat"    ?hidden="${!this.hebcal.isShabbat}"></slot>
       <slot name="yomtov"     ?hidden="${!this.hebcal.isChag}"></slot>
