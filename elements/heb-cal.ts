@@ -22,10 +22,10 @@ export class HebCalElement extends LitElement {
   accessor city = 'Jerusalem';
 
   @property({ type: Number })
-  accessor latitude?: number;
+  accessor latitude: number | undefined;
 
   @property({ type: Number })
-  accessor longitude?: number;
+  accessor longitude: number | undefined;
 
   @property({ type: Number, attribute: 'tzeit-angle' })
   accessor tzeitAngle = 7.083;
