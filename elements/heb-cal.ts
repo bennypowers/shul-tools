@@ -77,12 +77,6 @@ export class HebCalElement extends LitElement {
 
 export class HebCalChild extends LitElement {
   static styles = [childStyles];
-
-  @consume({ context: context })
-  accessor hebcal: HebCal;
-
-  get i18n(): I18nKeys {
-    return this.hebcal.i18n;
-  }
+  @consume({ context: context }) accessor hebcal: HebCal;
 }
 

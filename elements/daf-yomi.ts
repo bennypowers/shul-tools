@@ -13,12 +13,13 @@ export class DafYomi extends HebCalChild {
   render() {
     if (this.hebcal) {
       const daf = DailyLearning.lookup('dafYomi', this.hebcal.hDate);
-      console.log(daf, this.hebcal.events);
-      return html`
-        <span part="daf">${daf?.render(this.hebcal.locale)}</span>
-        <span part="rabbi">${this.rabbi}</span>
-        <span part="location">${this.location}</span>
-      `;
+      console.log(daf, this.hebcal.eventsToday);
+      if (daf)
+        return html`
+          <span part="daf">${daf?.render(this.hebcal.locale)}</span>
+          <span part="rabbi">${this.rabbi}</span>
+          <span part="location">${this.location}</span>
+        `;
     }
   }
 }

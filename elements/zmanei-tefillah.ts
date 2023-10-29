@@ -34,8 +34,7 @@ export class ZmaneiTefillah extends HebCalChild {
   #update() {
     for (const time of this.querySelectorAll('time')) {
       if (!time.dateTime) {
-        const { offset, offsetFrom } = time.dataset;
-        const parsed = parseFloat(offset)
+        const { offset, offsetFrom } = time.dataset;        const parsed = parseFloat(offset)
         if (!Number.isNaN(parsed)) {
           const from = this.hebcal.dailyZmanim.find(x => x.key === offsetFrom)?.date;
           const date = new Date(from);
