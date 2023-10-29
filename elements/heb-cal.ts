@@ -64,7 +64,7 @@ export class HebCalElement extends LitElement {
   #refresh = () => this.#hebcal = this.#getHebcal();
 
   #getHebcal() {
-    const { city, longitude, latitude, tzeitAngle } = this;
+    const { city, longitude, latitude, locale, tzeitAngle } = this;
     return new HebCal({
       city,
       locale,
