@@ -14,12 +14,12 @@ export class ZmaneiShabbat extends HebCalChild {
   ]
 
   render() {
-    if (this.hebcal?.events?.length) {
+    if (this.hebcal?.eventsToday?.length) {
       const { i18n, isChag, isErevChag, isShabbat, isErevShabbat } = this.hebcal;
       const locale = this.hebcal.locale.substring(0, 1);
-      console.log(this.hebcal.events.flatMap(x => x.getCategories()))
-      const lightingTimes = this.hebcal.events.filter(x => x.getCategories().some(y => y === 'candles' || y === 'havdalah'))
-      const parshah = this.hebcal.events.find(x => x.getCategories().some(y => y === 'parashat'))
+      console.log(this.hebcal.eventsToday.flatMap(x => x.getCategories()))
+      const lightingTimes = this.hebcal.eventsToday.filter(x => x.getCategories().some(y => y === 'candles' || y === 'havdalah'))
+      const parshah = this.hebcal.eventsToday.find(x => x.getCategories().some(y => y === 'parashat'))
       console.log(parshah);
       let desc = '';
       if (isShabbat || isErevShabbat)

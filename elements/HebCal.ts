@@ -7,12 +7,16 @@ import {
   flags,
 } from '@hebcal/core';
 
+export type ZmanimI18nKeys =
+  Record<(typeof HebCal.ZMANIM_KEYS)[number], string>;
+
 export interface I18nKeys extends ZmanimI18nKeys {
   shabbat: string;
   chag: string;
   zmanei: string;
   yom: string;
   and: string;
+  zmaneiTefillah: string;
 }
 
 export interface HebCalInit {
@@ -22,9 +26,6 @@ export interface HebCalInit {
   longitude: number;
   tzeitAngle: number;
 }
-
-export type ZmanimI18nKeys =
-  Record<(typeof HebCal.ZMANIM_KEYS)[number], string>;
 
 export class HebCal {
   static readonly THREE_MEDIUM_STARS = 7.083;
@@ -65,6 +66,7 @@ export class HebCal {
       zmanei: 'זמני',
       yom: 'יום',
       and: 'ו',
+      zmaneiTefillah: 'זמני תפילה',
     },
     'en-US': {
       alotHaShachar: 'dawn',
@@ -84,6 +86,7 @@ export class HebCal {
       zmanei: 'Halachic Times for',
       yom: 'Today',
       and: 'and ',
+      zmaneiTefillah: 'Prayer times',
     }
   }
 
@@ -115,7 +118,9 @@ export class HebCal {
 
   dailyZmanim = this.#getDailyZmanim();
 
-  events = this.#getEvents();
+  eventsToday = this.#getTodayEvents();
+
+  eventsTomorrow = this.#getTomorrowEvents();
 
   get i18n() { return HebCal.i18n[this.locale]; }
 
@@ -124,7 +129,7 @@ export class HebCal {
   get isErevShabbat() { return this.hDate.getDay() === 5; }
 
   get isChag() {
-    for (const event of this.events) {
+    for (const event of this.eventsToday) {
       if (event.getFlags() & flags.CHAG)
         return true
     }
@@ -134,11 +139,25 @@ export class HebCal {
   get isErevChag() {
     if (!this.isChag)
       return false;
-    for (const event of this.events) {
+    for (const event of this.eventsToday) {
       if (event.getFlags() & flags.EREV)
         return true
     }
     return false;
+  }
+
+  get isWeekday() {
+    return this.hDate.getDay() < 6 && !this.isChag
+  }
+
+  get isRoshChodesh() {
+    return this.eventsToday.at(0)
+      ?.getFlags() & flags.ROSH_CHODESH;
+  }
+
+  get isCholHamoed() {
+    return this.eventsToday.at(0)
+      ?.getFlags() & flags.ROSH_CHODESH;
   }
 
   constructor({ locale, latitude, longitude, city, tzeitAngle }: HebCalInit) {
@@ -155,7 +174,8 @@ export class HebCal {
     this.#location = this.#getLocation();
     if (this.#location) {
       this.#zmanim = this.#getZmanim();
-      this.events = this.#getEvents();
+      this.eventsToday = this.#getTodayEvents();
+      this.eventsTomorrow = this.#getTomorrowEvents();
       this.dailyZmanim = this.#getDailyZmanim();
       this.hDate = this.#getHDate();
     }
@@ -185,10 +205,7 @@ export class HebCal {
     );
   }
 
-  #getEvents(): HebCalEvent[] {
-    const start = this.date;
-    const end = new Date(start)
-          end.setDate(start.getDate() + 1);
+  #getEvents(start = this.date, end = this.date): HebCalEvent[] {
     return HebrewCalendar.calendar({
       location: this.#location,
       start,
@@ -209,6 +226,16 @@ export class HebCal {
         mishnaYomi: true,
       }
     });
+  }
+
+  #getTodayEvents(): HebCalEvent[] {
+    return this.#getEvents();
+  }
+
+  #getTomorrowEvents(): HebCalEvent[] {
+    const date = new Date(this.date);
+          date.setDate(date.getDate() + 1);
+    return this.#getEvents(this.date, date);
   }
 
   #getDailyZmanim() {
