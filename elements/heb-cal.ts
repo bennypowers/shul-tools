@@ -21,6 +21,12 @@ export class HebCalElement extends LitElement {
   @property()
   accessor city = 'Jerusalem';
 
+  @property({ type: Number })
+  accessor latitude?: number;
+
+  @property({ type: Number })
+  accessor longitude?: number;
+
   @property({ type: Number, attribute: 'tzeit-angle' })
   accessor tzeitAngle = 7.083;
 
@@ -58,10 +64,13 @@ export class HebCalElement extends LitElement {
   #refresh = () => this.#hebcal = this.#getHebcal();
 
   #getHebcal() {
+    const { city, longitude, latitude, tzeitAngle } = this;
     return new HebCal({
-      city: this.city,
-      locale: this.locale,
-      tzeitAngle: this.tzeitAngle,
+      city,
+      locale,
+      latitude,
+      longitude,
+      tzeitAngle,
     });
   }
 }

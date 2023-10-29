@@ -18,6 +18,8 @@ export interface I18nKeys extends ZmanimI18nKeys {
 export interface HebCalInit {
   city: string;
   locale: string;
+  latitude: number;
+  longitude: number;
   tzeitAngle: number;
 }
 
@@ -97,6 +99,10 @@ export class HebCal {
 
   city = 'Jerusalem';
 
+  latitude: number;
+
+  longitude: number;
+
   tzeitAngle = HebCal.THREE_MEDIUM_STARS;
 
   hDate: HDate;
@@ -135,12 +141,14 @@ export class HebCal {
     return false;
   }
 
-  constructor({ locale, city, tzeitAngle }: HebCalInit) {
+  constructor({ locale, latitude, longitude, city, tzeitAngle }: HebCalInit) {
     this.date = new Date();
     this.locale = locale
+    this.latitude = latitude;
+    this.longitude = longitude;
     this.city = city;
     this.tzeitAngle = tzeitAngle;
-    this.hDate = new HDate(this.date)
+    this.hDate = new HDate(this.date);
     const next = new Date(this.date)
           next.setDate(this.date.getDate() + 1);
     this.nextHDate = new HDate(next);
@@ -154,7 +162,22 @@ export class HebCal {
   }
 
   #getLocation() {
-    return Location.lookup(this.city);
+    const cityLookup = Location.lookup(this.city);
+    const { il, tzid, cc } = cityLookup
+    if (this.latitude && this.longitude)
+      /**
+       * Initialize a Location instance
+       * @param {number} latitude - Latitude as a decimal, valid range -90 thru +90 (e.g. 41.85003)
+       * @param {number} longitude - Longitude as a decimal, valid range -180 thru +180 (e.g. -87.65005)
+       * @param {boolean} il - in Israel (true) or Diaspora (false)
+       * @param {string} tzid - Olson timezone ID, e.g. "America/Chicago"
+       * @param {string} cityName - optional descriptive city name
+       * @param {string} countryCode - ISO 3166 alpha-2 country code (e.g. "FR")
+       * @param {string} geoid - optional string or numeric geographic ID
+       */
+      return new Location(this.latitude, this.longitude, il, tzid, this.city, cc);
+    else
+      return cityLookup
   }
 
   #getZmanim(): Zmanim {
