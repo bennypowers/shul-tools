@@ -39,7 +39,7 @@ export interface DailyZman {
 export class HebCal {
   static readonly THREE_MEDIUM_STARS = 7.083;
 
-  static readonly THREE_SMALL_STARS = 8;
+  static readonly THREE_SMALL_STARS = 8.5;
 
   static readonly ZMANIM_KEYS = [
     'alotHaShachar',
@@ -115,7 +115,7 @@ export class HebCal {
 
   longitude: number;
 
-  tzeitAngle = HebCal.THREE_MEDIUM_STARS;
+  tzeitAngle = HebCal.THREE_SMALL_STARS;
 
   hDate: HDate;
 
