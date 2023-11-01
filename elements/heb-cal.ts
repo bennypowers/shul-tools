@@ -30,7 +30,7 @@ export class HebCalElement extends LitElement {
   accessor longitude: number | undefined;
 
   @property({ type: Number, attribute: 'tzeit-angle' })
-  accessor tzeitAngle = 7.083;
+  accessor tzeitAngle: number | undefined;
 
   @property({ type: Number, attribute: 'candles-minutes-before-sundown' })
   accessor candlesMinutesBeforeSundown: number;
