@@ -4,8 +4,9 @@ import { styleMap } from 'lit/directives/style-map.js';
 
 import { HebcalDayConsumer } from './hebcal-day.js';
 
-import styles from './hebcal-clock.css';
 import { classMap } from 'lit/directives/class-map.js';
+
+import styles from './hebcal-clock.css';
 
 const MS_PER_CLOCK_FACE = 1000 * 60 * 60 * 24;
 
