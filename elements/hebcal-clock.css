@@ -1,0 +1,149 @@
+:host([type="digital" i]) {
+  display: grid;
+  background: white;
+  padding: 0.5em;
+  align-items: center;
+  border-radius: 5px;
+  justify-content: center;
+  text-align: center;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'time date'
+    'time zone';
+}
+
+:host([type="digital"]),
+:host([type="analogue"]) time {
+  border: 4px solid black;
+}
+
+[part=time] {
+  grid-area: time;
+  justify-self: start;
+  font-weight: 500;
+}
+
+[part=date] {
+  grid-area: date;
+  font-size: 1.2em;
+}
+
+[part=zone] {
+  grid-area: zone;
+  font-weight: 100;
+  font-size: .8em;
+}
+
+time { display: contents;
+}
+
+/* digital clock */
+strong {
+  display: flex;
+  align-items: center;
+  font-family: monospace;
+  font-size: 200%;
+  & > * {
+    display: block;
+  }
+}
+
+[part=hour],
+[part=minute],
+[part=second] {
+  width: 1.5em;
+}
+
+/**
+ * Analogue zmanim clock
+ * ticking hands based on work done by Mate Marschalko
+ * https://css-tricks.com/of-course-we-can-make-a-css-only-clock-that-tells-the-current-time/
+ */
+
+:host([type=analogue i]) {
+  aspect-ratio: 1;
+}
+
+time {
+  --_second: 1s;
+  --_minute: calc(var(--_second) * 60);
+  --_hour: calc(var(--_minute) * 60);
+  --_degrees-per-second: 6deg;
+  --_time-shift-hour: calc(var(--hour) * var(--_hour));
+  --_time-shift-minute: calc(var(--minute) * var(--_minute));
+  --_time-shift-second: calc(var(--second) * var(--_second));
+}
+
+@keyframes rotate {
+  from { rotate: 0; }
+  to { rotate: 1turn; }
+}
+
+:host([type=analogue i]) time {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  margin: 0 auto;
+  position: relative;
+  rotate: 180deg;
+  overflow: hidden;
+}
+
+#face {
+  width: 100%;
+  aspect-ratio: 1;
+  display: block;
+  rotate: 180deg;
+  background:
+    conic-gradient(
+      var(--color-previous, orange),
+      var(--color-previous, orange) 0 var(--angle-twilight-start),
+      var(--color-twilight-start, cyan) 0 var(--angle-twilight-end),
+      var(--color-twilight-end, yellow) 0
+    );
+}
+
+.hand {
+  position: absolute;
+  top: 50%;
+  transform-origin: center 0;
+  left: calc(50% - var(--width) / 2);
+  width: var(--width);
+  height: var(--height);
+  background-color: var(--color);
+}
+
+#second {
+  --width: 5px;
+  --height: 140px;
+  --color: var(--yellow, yellow);
+}
+
+#minute {
+  --width: 10px;
+  --height: 90px;
+  --color: var(--blue, blue);
+}
+
+#hour {
+  --width: 10px;
+  --height: 50px;
+  --color: var(--dark-blue, darkblue);
+}
+
+#second.hand {
+  rotate: calc(var(--second) * var(--_degrees-per-second));
+}
+
+#minute.hand {
+  animation: rotate linear var(--_hour) infinite;
+  animation-delay: calc(var(--_time-shift-minute) * -1);
+}
+
+#hour.hand {
+  animation: rotate linear calc(var(--_hour) * 12) infinite;
+  animation-delay: calc(
+    (var(--_time-shift-hour) + var(--_time-shift-minute)) * -1
+  );
+}

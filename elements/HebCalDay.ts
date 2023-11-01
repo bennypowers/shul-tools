@@ -7,7 +7,7 @@ import {
   flags,
 } from '@hebcal/core';
 
-export type ZmanimKey = typeof HebCal.ZMANIM_KEYS[number];
+export type ZmanimKey = typeof HebCalDay.ZMANIM_KEYS[number];
 
 export type ZmanimI18nKeys =
   Record<ZmanimKey, string>;
@@ -36,7 +36,7 @@ export interface DailyZman {
   next: boolean,
 }
 
-export class HebCal {
+export class HebCalDay implements Record<ZmanimKey, Date> {
   static readonly THREE_MEDIUM_STARS = 7.083;
 
   static readonly THREE_SMALL_STARS = 8.5;
@@ -109,13 +109,26 @@ export class HebCal {
 
   locale = 'he-IL';
 
-  city = 'Jerusalem';
+  city: string;
 
   latitude: number;
 
   longitude: number;
 
-  tzeitAngle = HebCal.THREE_SMALL_STARS;
+  tzeitAngle = HebCalDay.THREE_SMALL_STARS;
+
+  alotHaShachar: Date;
+  misheyakir: Date;
+  sunrise: Date;
+  sofZmanShmaMGA: Date;
+  sofZmanShma: Date;
+  sofZmanTfillaMGA: Date;
+  sofZmanTfilla: Date;
+  minchaGedola: Date;
+  minchaKetana: Date;
+  plagHaMincha: Date;
+  sunset: Date;
+  tzeit: Date;
 
   hDate: HDate;
 
@@ -131,7 +144,7 @@ export class HebCal {
 
   eventsTomorrow: HebCalEvent[];
 
-  get i18n() { return HebCal.i18n[this.locale]; }
+  get i18n() { return HebCalDay.i18n[this.locale]; }
 
   get isShabbat() { return this.hDate.getDay() === 6; }
 
@@ -170,12 +183,11 @@ export class HebCal {
   }
 
   constructor({ locale, latitude, longitude, city, tzeitAngle }: HebCalInit) {
-    this.date = new Date();
-    this.locale = locale
+    this.locale = locale ?? this.locale
     this.latitude = latitude;
     this.longitude = longitude;
     this.city = city;
-    this.tzeitAngle = tzeitAngle;
+    this.tzeitAngle = tzeitAngle ?? this.tzeitAngle;
     this.hDate = new HDate(this.date);
     const next = new Date(this.date)
           next.setDate(this.date.getDate() + 1);
@@ -252,11 +264,12 @@ export class HebCal {
     const { date: now, tzeitAngle } = this;
     const zmanim = this.#zmanim
     let lastSeenIsPast = false
-    return HebCal.ZMANIM_KEYS.map(key => {
+    return HebCalDay.ZMANIM_KEYS.map(key => {
       const date = zmanim[key](...key === 'tzeit' ? [tzeitAngle] : []);
       const past = date < now;
       const next = lastSeenIsPast && !past;
       lastSeenIsPast = past && !next
+      this[key] = date;
       return {
         key,
         date,

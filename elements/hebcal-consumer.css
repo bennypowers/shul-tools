@@ -1,16 +1,21 @@
 heading {
   display: flex;
   align-items: center;
-  gap: 0.25em;
+  gap: var(--hebcal-column-gap);
 }
 
 dl {
   display: grid;
   grid-template-columns: auto;
   align-items: end;
-  gap: 0.25em;
   margin: 0;
-  @media (min-width: 400px) {
+  gap:
+    var(--hebcal-row-gap, 0.5em)
+    var(--hebcal-column-gap, 1em);
+}
+
+@media (min-width: 400px) {
+  dl {
     grid-template-columns: max-content auto;
   }
 }
@@ -34,5 +39,5 @@ dd {
 }
 
 .next {
-  --size: 120%;
+  --size: var(--hebcal-next-zman-font-size, 120%);
 }

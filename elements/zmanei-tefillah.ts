@@ -1,12 +1,12 @@
 import { html } from 'lit';
-import { HebCalChild } from './heb-cal.js';
+import { HebcalDayConsumer } from './hebcal-day.js';
 import { customElement } from 'lit/decorators.js';
 
 import style from './zmanei-tefillah.css';
 
 @customElement('zmanei-tefillah')
-export class ZmaneiTefillah extends HebCalChild {
-  static readonly styles = [...HebCalChild.styles, style];
+export class ZmaneiTefillah extends HebcalDayConsumer {
+  static readonly styles = [...HebcalDayConsumer.styles, style];
 
   #mo = new MutationObserver(() => this.#update());
 
@@ -22,12 +22,12 @@ export class ZmaneiTefillah extends HebCalChild {
 
   render() {
     return html`
-      <h2 id="heading">${this.hebcal?.i18n?.zmaneiTefillah ?? ''}</h2>
-      <slot name="weekday"    ?hidden="${!this.hebcal.isWeekday}"></slot>
-      <slot name="shabbat"    ?hidden="${!this.hebcal.isShabbat}"></slot>
-      <slot name="yomtov"     ?hidden="${!this.hebcal.isChag}"></slot>
-      <slot name="chodesh"    ?hidden="${!this.hebcal.isRoshChodesh}"></slot>
-      <slot name="cholhamoed" ?hidden="${!this.hebcal.isCholHamoed}"></slot>
+      <h2 id="heading">${this.hayom?.i18n?.zmaneiTefillah ?? ''}</h2>
+      <slot name="weekday"    ?hidden="${!this.hayom.isWeekday}"></slot>
+      <slot name="shabbat"    ?hidden="${!this.hayom.isShabbat}"></slot>
+      <slot name="yomtov"     ?hidden="${!this.hayom.isChag}"></slot>
+      <slot name="chodesh"    ?hidden="${!this.hayom.isRoshChodesh}"></slot>
+      <slot name="cholhamoed" ?hidden="${!this.hayom.isCholHamoed}"></slot>
     `;
   }
 
@@ -36,11 +36,11 @@ export class ZmaneiTefillah extends HebCalChild {
       if (!time.dateTime) {
         const { offset, offsetFrom } = time.dataset;        const parsed = parseFloat(offset)
         if (!Number.isNaN(parsed)) {
-          const from = this.hebcal.dailyZmanim.find(x => x.key === offsetFrom)?.date;
+          const from = this.hayom.dailyZmanim.find(x => x.key === offsetFrom)?.date;
           const date = new Date(from);
                 date.setTime(date.getTime() + parsed * 60 * 1000)
           time.dateTime = date.toISOString();
-          time.textContent = date.toLocaleTimeString(this.hebcal.locale, { timeStyle: 'short' });
+          time.textContent = date.toLocaleTimeString(this.hayom.locale, { timeStyle: 'short' });
         }
       }
     }

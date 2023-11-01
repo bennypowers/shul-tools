@@ -1,12 +1,13 @@
 :host {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  justify-content: start;
-  gap: 0.25em;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-auto-rows: max-content;
+  row-gap:
+    var(--hebcal-row-gap, 0.5em)
+    var(--hebcal-column-gap, 1em);
 }
 
-#heading {
-  width: 100%;
+h2 {
+  grid-column: 1/-1;
 }
 

@@ -41,17 +41,12 @@
         align-items: center;
       }
 
-      heb-cal {
+      hebcal-day {
         font-family: Alef, serif;
       }
 
       #main-header {
         justify-content: space-between;
-
-        & fullscreen-toggle {
-          height: 40px;
-          width: 40px;
-        }
       }
 
       main, #main-header {
@@ -69,10 +64,10 @@
   </head>
   <body>
     <main>
-            <heb-cal city="Jerusalem"
-               latitude="31.80290"
-               longitude="32.24075"
-               candles-minutes-before-sundown="40">
+      <hebcal-day city="Jerusalem"
+                  latitude="31.80290"
+                  longitude="32.24075"
+                  candles-minutes-before-sundown="40">
         <zmanei-tefillah>
           <strong slot="weekday">שחרית</strong>
           <time slot="weekday"
@@ -139,7 +134,7 @@
             <strong>יש לסמוך על הזמנים המודפסים</strong>
           </small>
         </zmanei-yom>
-      </heb-cal>
+      </hebcal-day>
 
     </main>
   </body>

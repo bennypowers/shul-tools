@@ -2,24 +2,24 @@ import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
-import { HebCalChild } from './heb-cal.js';
+import { HebcalDayConsumer } from './hebcal-day.js';
 
 import style from './zmanei-shabbat.css';
 
 @customElement('zmanei-shabbat')
-export class ZmaneiShabbat extends HebCalChild {
+export class ZmaneiShabbat extends HebcalDayConsumer {
   static readonly styles = [
-    ...HebCalChild.styles,
+    ...HebcalDayConsumer.styles,
     style
   ]
 
   render() {
-    if (this.hebcal?.eventsToday?.length) {
-      const { i18n, isChag, isErevChag, isShabbat, isErevShabbat } = this.hebcal;
-      const locale = this.hebcal.locale.substring(0, 1);
-      console.log(this.hebcal.eventsToday.flatMap(x => x.getCategories()))
-      const lightingTimes = this.hebcal.eventsToday.filter(x => x.getCategories().some(y => y === 'candles' || y === 'havdalah'))
-      const parshah = this.hebcal.eventsToday.find(x => x.getCategories().some(y => y === 'parashat'))
+    if (this.hayom?.eventsToday?.length) {
+      const { i18n, isChag, isErevChag, isShabbat, isErevShabbat } = this.hayom;
+      const locale = this.hayom.locale.substring(0, 1);
+      console.log(this.hayom.eventsToday.flatMap(x => x.getCategories()))
+      const lightingTimes = this.hayom.eventsToday.filter(x => x.getCategories().some(y => y === 'candles' || y === 'havdalah'))
+      const parshah = this.hayom.eventsToday.find(x => x.getCategories().some(y => y === 'parashat'))
       console.log(parshah);
       let desc = '';
       if (isShabbat || isErevShabbat)
