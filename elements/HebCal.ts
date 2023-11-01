@@ -1,14 +1,16 @@
 import {
   HDate,
   HebrewCalendar,
-  Location,
+  Location as HebCalLocation,
   Zmanim,
   Event as HebCalEvent,
   flags,
 } from '@hebcal/core';
 
+export type ZmanimKey = typeof HebCal.ZMANIM_KEYS[number];
+
 export type ZmanimI18nKeys =
-  Record<(typeof HebCal.ZMANIM_KEYS)[number], string>;
+  Record<ZmanimKey, string>;
 
 export interface I18nKeys extends ZmanimI18nKeys {
   shabbat: string;
@@ -25,6 +27,13 @@ export interface HebCalInit {
   latitude: number;
   longitude: number;
   tzeitAngle: number;
+}
+
+export interface DailyZman {
+  key: ZmanimKey,
+  date: Date,
+  past: boolean,
+  next: boolean,
 }
 
 export class HebCal {
@@ -112,15 +121,15 @@ export class HebCal {
 
   nextHDate: HDate;
 
-  #location = Location.lookup(this.city);
+  #location: HebCalLocation
 
-  #zmanim = this.#getZmanim();
+  #zmanim: Zmanim;
 
-  dailyZmanim = this.#getDailyZmanim();
+  dailyZmanim: DailyZman[];
 
-  eventsToday = this.#getTodayEvents();
+  eventsToday: HebCalEvent[];
 
-  eventsTomorrow = this.#getTomorrowEvents();
+  eventsTomorrow: HebCalEvent[];
 
   get i18n() { return HebCal.i18n[this.locale]; }
 
@@ -172,19 +181,18 @@ export class HebCal {
           next.setDate(this.date.getDate() + 1);
     this.nextHDate = new HDate(next);
     this.#location = this.#getLocation();
-    if (this.#location) {
-      this.#zmanim = this.#getZmanim();
-      this.eventsToday = this.#getTodayEvents();
-      this.eventsTomorrow = this.#getTomorrowEvents();
-      this.dailyZmanim = this.#getDailyZmanim();
-      this.hDate = this.#getHDate();
-    }
+    if (!this.#location)
+      throw new Error(`Could not determine location for ${city ?? `${latitude}/${longitude}`}`);
+    this.#zmanim = this.#getZmanim();
+    this.eventsToday = this.#getTodayEvents();
+    this.eventsTomorrow = this.#getTomorrowEvents();
+    this.dailyZmanim = this.#getDailyZmanim();
   }
 
   #getLocation() {
-    const found = Location.lookup(this.city);
+    const found = HebCalLocation.lookup(this.city);
     if (this.latitude && this.longitude)
-      return new Location(
+      return new HebCalLocation(
         this.latitude,
         this.longitude,
         found?.getIsrael(),
@@ -206,15 +214,17 @@ export class HebCal {
   }
 
   #getEvents(start = this.date, end = this.date): HebCalEvent[] {
+    const location = this.#location;
+    /** Hebcals' locale isn't an iso locale, but a pronunciation hint */
+    const locale = this.locale.match(/^(he|en)$/) ? this.locale : 'he';
     return HebrewCalendar.calendar({
-      location: this.#location,
-      start,
-      end,
+      location,
+      start, end,
       candlelighting: true,
       candleLightingMins: 40,
       havdalahDeg: this.tzeitAngle,
       il: this.locale.endsWith('IL'),
-      locale: this.locale.match(/^(he|en)$/) ? this.locale : 'he',
+      locale,
       sedrot: true,
       omer: true,
       shabbatMevarchim: true,
@@ -238,28 +248,22 @@ export class HebCal {
     return this.#getEvents(this.date, date);
   }
 
-  #getDailyZmanim() {
-    this.#zmanim ??= this.#getZmanim();
-    const now = this.date;
-    const dz = HebCal.ZMANIM_KEYS.map(key => {
-      const date = this.#zmanim[key](...key === 'tzeit' ? [this.tzeitAngle] : []);
+  #getDailyZmanim(): DailyZman[] {
+    const { date: now, tzeitAngle } = this;
+    const zmanim = this.#zmanim
+    let lastSeenIsPast = false
+    return HebCal.ZMANIM_KEYS.map(key => {
+      const date = zmanim[key](...key === 'tzeit' ? [tzeitAngle] : []);
       const past = date < now;
+      const next = lastSeenIsPast && !past;
+      lastSeenIsPast = past && !next
       return {
         key,
         date,
         past,
-        next: false,
+        next,
       }
     });
-    dz.forEach((z, i) => {
-      if (dz.at(i - 1)?.past && !z.past)
-        z.next = true;
-    });
-    return dz;
-  }
-
-  #getHDate(): HDate {
-    return new HDate(this.date);
   }
 }
 

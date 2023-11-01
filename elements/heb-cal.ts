@@ -40,7 +40,7 @@ export class HebCalElement extends LitElement {
 
   @state()
   @provide({ context })
-  accessor #hebcal = this.#getHebcal();
+  accessor hebcal = this.#getHebcal();
 
   connectedCallback() {
     super.connectedCallback();
@@ -52,7 +52,7 @@ export class HebCalElement extends LitElement {
   }
 
   render() {
-    const { date, locale } = this.#hebcal;
+    const { date, locale } = this.hebcal;
     const parts = new Intl.DateTimeFormat(locale, { timeZoneName: 'long', hour: '2-digit', minute: '2-digit', second: '2-digit' }).formatToParts(date);
     const hour = HebCalElement.#findPart(parts, 'hour');
     const minute = HebCalElement.#findPart(parts, 'minute');
@@ -76,7 +76,7 @@ export class HebCalElement extends LitElement {
     `;
   }
 
-  #refresh = () => this.#hebcal = this.#getHebcal();
+  #refresh = () => this.hebcal = this.#getHebcal();
 
   #getHebcal() {
     const { city, longitude, latitude, locale, tzeitAngle } = this;
