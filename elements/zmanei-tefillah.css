@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: auto auto;
   grid-auto-rows: max-content;
-  row-gap:
+  gap:
     var(--hebcal-row-gap, 0.5em)
     var(--hebcal-column-gap, 1em);
 }
