@@ -5,32 +5,37 @@ import { styleMap } from 'lit/directives/style-map.js';
 import { HebcalDayConsumer } from './hebcal-day.js';
 
 import styles from './hebcal-clock.css';
+import { classMap } from 'lit/directives/class-map.js';
 
 const MS_PER_CLOCK_FACE = 1000 * 60 * 60 * 24;
 
 /**
  * Hebcal clock
  *
+ *
  */
 @customElement('hebcal-clock')
 export class HebcalClock extends HebcalDayConsumer {
   static styles = [styles];
 
-  static #findPart(parts: Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPart['type']) {
-    return parts.find(x => x.type === type)?.value ?? '';
-  }
-
   @property({ reflect: true }) accessor type: 'digital' | 'analogue' = 'digital';
 
-  #parts: Record<'hour'|'minute'|'second'|'timeZoneName', string>;
+  #parts: Record<'hour' | 'minute' | 'second' | 'timeZoneName' | 'dayPeriod', string>;
+
+  #midnight: Date;
 
   override willUpdate() {
-    this.#parts = this.#getTimeParts()
+    this.#midnight = new Date();
+    this.#midnight.setHours(0)
+    this.#midnight.setMinutes(0)
+    this.#midnight.setSeconds(0)
+    this.#midnight.setMilliseconds(0);
+    this.#parts = this.#getTimeParts();
   }
 
   override render() {
     const { date, locale, hDate } = this.hayom;
-    const { hour, minute, second, timeZoneName } = this.#parts;
+    const { hour, minute, second, dayPeriod, timeZoneName } = this.#parts;
 
     const locale2Digit = locale.substring(0, 2);
 
@@ -46,7 +51,9 @@ export class HebcalClock extends HebcalDayConsumer {
         </strong>
         <span class="date" part="date">${hDate?.render(locale2Digit)}</span>
         <small part="zone">${timeZoneName}</small>` : html`
-        <div id="face" style="${styleMap(this.#getAngleStyles())}"></div>
+        <div id="face"
+             class="${classMap({ [dayPeriod]: true })}"
+             style="${styleMap(this.#getAngleStyles())}"></div>
         <div id="second" class="hand"></div>
         <div id="minute" class="hand"></div>
         <div id="hour"   class="hand"></div>`}
@@ -55,17 +62,19 @@ export class HebcalClock extends HebcalDayConsumer {
   }
 
   #getTimeParts() {
-    const parts = new Intl.DateTimeFormat(this.hayom.locale, {
-      timeZoneName: 'long',
+    const [
+      { value: hour },
+      { value: minute },
+      { value: second },
+      { value: timeZoneName },
+    ] = new Intl.DateTimeFormat(this.hayom.locale, {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-    }).formatToParts(this.hayom.date);
-    const hour = HebcalClock.#findPart(parts, 'hour');
-    const minute = HebcalClock.#findPart(parts, 'minute');
-    const second = HebcalClock.#findPart(parts, 'second');
-    const timeZoneName = HebcalClock.#findPart(parts, 'timeZoneName');
-    return { hour, minute, second, timeZoneName };
+      timeZoneName: 'long',
+    }).formatToParts(this.hayom.date).filter(x => x.type !== 'literal');
+    const dayPeriod = this.hayom.date.getHours() < 12 ? 'am' : 'pm';
+    return { hour, minute, second, timeZoneName, dayPeriod };
   }
 
   #calcAngle(
@@ -73,9 +82,9 @@ export class HebcalClock extends HebcalDayConsumer {
     ms: number,
     hourOffset = 0,
   ): string {
-    const offset = ms - epochMidnight//  - (hourOffset * 1000 * 60 * 60);
+    const offset = ms - epochMidnight - (hourOffset * 1000 * 60 * 60);
     const ratio = (offset / MS_PER_CLOCK_FACE);
-    const degrees = (ratio * 360);
+    const degrees = (ratio * 360) * (hourOffset / 6);
     return `${degrees.toFixed(2)}deg`;
   }
 
@@ -83,12 +92,7 @@ export class HebcalClock extends HebcalDayConsumer {
     // from midnight to noon, only show dawn and sunrise
     // from noon to midnight, only show sunset and nightfall
     if (this.type === 'digital') return {}
-    const midnight = new Date();
-          midnight.setHours(0)
-          midnight.setMinutes(0)
-          midnight.setSeconds(0)
-          midnight.setMilliseconds(0);
-    const epochMidnight = midnight.getTime();
+    const epochMidnight = this.#midnight.getTime();
 
     const hour = new Date().getHours() ;
 
