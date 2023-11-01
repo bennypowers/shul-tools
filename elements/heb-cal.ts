@@ -91,6 +91,6 @@ export class HebCalElement extends LitElement {
 export class HebCalChild extends LitElement {
   static styles = [sharedStyles, childStyles];
 
-  @consume({ context }) accessor hebcal: HebCal;
+  @consume({ context, subscribe: true }) accessor hebcal: HebCal;
 }
 
