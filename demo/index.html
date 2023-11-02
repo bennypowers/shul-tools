@@ -26,48 +26,115 @@
       }
     </script>
     <style>
+      :root {
+        --root-gap: 24px;
+        --hebcal-row-gap: var(--root-gap);
+        --hebcal-column-gap: calc(var(--root-gap) * 1.6);
+        --hebcal-clock-size: 200px;
+        --hebcal-clock-day-color: #ffefb6;
+        --hebcal-clock-night-color: #053752;
+      }
+
       html,
       body {
         height: 100%;
         padding: 0;
         margin: 0;
-        background: cornsilk;
         font-family: Tinos, serif;
       }
 
-      #main-header {
-        display: flex;
-        gap: 1em;
-        align-items: center;
+      main, form {
+        padding-inline: 1em;
+        font-size: 200%;
       }
 
       hebcal-day {
-        font-family: Alef, serif;
+        margin-block: var(--root-gap);
+        font-family: Alef, sans-serif;
+        display: grid;
+        row-gap: var(--hebcal-row-gap);
+        align-content: start;
+        grid-template-rows: max-content min-content min-content min-content auto;
+        grid-template-areas:
+          'clock clock'
+          'candles candles'
+          'yom tefillah'
+          'yom analogue'
+          'foot foot'
       }
 
-      #main-header {
-        justify-content: space-between;
+      hebcal-clock[type="digital"] {
+        column-gap: var(--hebcal-column-gap);
+        grid-area: clock;
+        &::part(time) {
+          font-family: 'Chakra Petch', sans-serif;
+        }
       }
 
-      main, #main-header {
-        padding-inline: 1em;
+      hebcal-clock[type="analogue"] {
+        grid-area: analogue;
       }
 
-      main {
-        font-size: 200%;
+      zmanei-yom {
+        grid-area: yom;
+      }
+
+      zmanei-tefillah {
+        grid-area: tefillah;
+      }
+
+      zmanei-shabbat {
+        grid-area: candles;
+      }
+
+      #disclaimer {
+        grid-area: foot;
       }
 
     </style>
     <script type="module">
       import '@shul/elements';
+      const hebcal = document.getElementById('hebcal');
+      const analogue = document.getElementById('analogue');
+      const knobs = document.getElementById('knobs');
+      function sync() {
+        const date = new Date(knobs.elements.date.value);
+        if (date.toString() !== 'Invalid Date')
+          hebcal.debugDate = date;
+        else
+          hebcal.debugDate = undefined;
+        if (knobs.elements.clockSize.value !== '')
+          analogue.style.setProperty('width', knobs.elements.clockSize.value + '%');
+      }
+      knobs.addEventListener('input', sync);
+      knobs.addEventListener('reset', sync);
+      sync();
     </script>
   </head>
   <body>
+    <header lang="en" dir="ltr">
+      <form id="knobs">
+        <label>Debug date
+          <input name="date" type="datetime-local">
+        </label>
+        <button type="reset">Reset</button>
+        <label>Clock size
+          <input name="clockSize" type="range" value="100">
+        </label>
+        <button type="reset">Reset</button>
+      </form>
+    </header>
     <main>
-      <hebcal-day city="Jerusalem"
+      <hebcal-day id="hebcal"
+                  city="Jerusalem"
                   latitude="31.80290"
                   longitude="32.24075"
                   candles-minutes-before-sundown="40">
+
+        <hebcal-clock type="digital"></hebcal-clock>
+
+        <hebcal-clock id="analogue" type="analogue"></hebcal-clock>
+
         <zmanei-tefillah>
           <strong slot="weekday">שחרית</strong>
           <time slot="weekday"
@@ -123,18 +190,21 @@
         </zmanei-tefillah>
 
         <daf-yomi></daf-yomi>
+
         <zmanei-shabbat></zmanei-shabbat>
-        <zmanei-yom>
-          <small slot="footer">
-            הזמנים חושבו לפי מיקום המדויק של בית הכנסת
-            ובגובה פני הים.
-            במקרא של אי הסכמה בין
-            הזמנים שמופיעים פה לבין
-            הזמנים המודפסים בלוח,
-            <strong>יש לסמוך על הזמנים המודפסים</strong>
-          </small>
-        </zmanei-yom>
+
+        <zmanei-yom></zmanei-yom>
+
+        <small id="disclaimer">
+          הזמנים חושבו לפי מיקום המדויק של בית הכנסת
+          ובגובה פני הים.
+          במקרא של אי הסכמה בין
+          הזמנים שמופיעים פה לבין
+          הזמנים המודפסים בלוח,
+          <strong>יש לסמוך על הזמנים המודפסים</strong>
+        </small>
       </hebcal-day>
+
 
     </main>
   </body>

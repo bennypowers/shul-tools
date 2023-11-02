@@ -12,33 +12,21 @@ const MS_PER_CLOCK_FACE = 1000 * 60 * 60 * 24;
 
 /**
  * Hebcal clock
- *
- *
  */
 @customElement('hebcal-clock')
 export class HebcalClock extends HebcalDayConsumer {
   static styles = [styles];
 
-  @property({ reflect: true }) accessor type: 'digital' | 'analogue' = 'digital';
-
-  #parts: Record<'hour' | 'minute' | 'second' | 'timeZoneName' | 'dayPeriod', string>;
-
-  #midnight: Date;
-
-  override willUpdate() {
-    this.#midnight = new Date();
-    this.#midnight.setHours(0)
-    this.#midnight.setMinutes(0)
-    this.#midnight.setSeconds(0)
-    this.#midnight.setMilliseconds(0);
-    this.#parts = this.#getTimeParts();
-  }
+  /**
+   * Digital clocks display the current 24-hour time
+   * as well as the hebrew date, and the seasonal clock (winter / summer)
+   */
+  @property({ reflect: true })
+  accessor type: 'digital' | 'analogue' = 'digital';
 
   override render() {
     const { date, locale, hDate } = this.hayom;
-    const { hour, minute, second, dayPeriod, timeZoneName } = this.#parts;
-
-    const locale2Digit = locale.substring(0, 2);
+    const { hour, minute, second, dayPeriod, timeZoneName } = this.hayom.timeParts;
 
     return html`
       <time datetime="${date.toISOString()}"
@@ -50,69 +38,65 @@ export class HebcalClock extends HebcalDayConsumer {
           <span part="colon">:</span>
           <span part="second">${second}</span>
         </strong>
-        <span class="date" part="date">${hDate?.render(locale2Digit)}</span>
+        <span class="date" part="date">${hDate.render(locale.substring(0, 2))}</span>
         <small part="zone">${timeZoneName}</small>` : html`
         <div id="face"
              class="${classMap({ [dayPeriod]: true })}"
              style="${styleMap(this.#getAngleStyles())}"></div>
         <div id="second" class="hand"></div>
         <div id="minute" class="hand"></div>
-        <div id="hour"   class="hand"></div>`}
+        <div id="hour"   class="hand"></div>
+        <ul id="indices">
+          <li>•</li>
+          <li>•</li>
+          <li class="num">3</li>
+          <li>•</li>
+          <li>•</li>
+          <li class="num">6</li>
+          <li>•</li>
+          <li>•</li>
+          <li class="num">9</li>
+          <li>•</li>
+          <li>•</li>
+          <li class="num">12</li>
+        </ul>`}
       </time>
     `;
   }
 
-  #getTimeParts() {
-    const [
-      { value: hour },
-      { value: minute },
-      { value: second },
-      { value: timeZoneName },
-    ] = new Intl.DateTimeFormat(this.hayom.locale, {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      timeZoneName: 'long',
-    }).formatToParts(this.hayom.date).filter(x => x.type !== 'literal');
-    const dayPeriod = this.hayom.date.getHours() < 12 ? 'am' : 'pm';
-    return { hour, minute, second, timeZoneName, dayPeriod };
-  }
-
-  #calcAngle(
-    epochMidnight: number,
-    ms: number,
-    hourOffset = 0,
-  ): string {
-    const offset = ms - epochMidnight - (hourOffset * 1000 * 60 * 60);
-    const ratio = (offset / MS_PER_CLOCK_FACE);
-    const degrees = (ratio * 360) * (hourOffset / 6);
+  #calcAngle(date: Date): string {
+    const ms = date.getTime();
+    const epochMidnight = this.hayom.midnight.getTime();
+    const hourOffset = this.hayom.timeParts.dayPeriod === 'pm' ? 12 : 0;
+    const offsetMs = ms - epochMidnight - (hourOffset * 1000 * 60 * 60);
+    const ratio = (offsetMs / MS_PER_CLOCK_FACE);
+    const degrees = (ratio * 360) * 2;
     return `${degrees.toFixed(2)}deg`;
   }
 
+  // from midnight to noon, only show dawn and sunrise
+  // from noon to midnight, only show sunset and nightfall
   #getAngleStyles() {
-    // from midnight to noon, only show dawn and sunrise
-    // from noon to midnight, only show sunset and nightfall
     if (this.type === 'digital') return {}
-    const epochMidnight = this.#midnight.getTime();
-
-    const hour = new Date().getHours() ;
-
-    if (hour > 0 && hour <= 12)
-      return {
-        '--angle-twilight-start': this.#calcAngle(epochMidnight, this.hayom.alotHaShachar.getTime()),
-        '--angle-twilight-end': this.#calcAngle(epochMidnight, this.hayom.sunrise.getTime()),
+    switch (this.hayom.timeParts.dayPeriod) {
+      case 'am': return {
+        '--angle-twilight-start': this.#calcAngle(this.hayom.alotHaShachar),
+        '--angle-twilight-end': this.#calcAngle(this.hayom.sunrise),
       };
-    else
-      return {
-        '--angle-twilight-start': this.#calcAngle(epochMidnight, this.hayom.sunset.getTime(), 12),
-        '--angle-twilight-end': this.#calcAngle(epochMidnight, this.hayom.tzeit.getTime(), 12),
+      case 'pm': return {
+        '--angle-twilight-start': this.#calcAngle(this.hayom.sunset),
+        '--angle-twilight-end': this.#calcAngle(this.hayom.tzeit),
       };
+    }
   }
 
   #getTimeStyles() {
-    const { hour, minute, second } = this.#parts;
-    return Object.fromEntries(Object.entries({ second, minute, hour })
-      .map(([k, v]) => [`--${k}`, v]))
+    const { hour, minute, second } = this.hayom.timeParts;
+    return {
+      '--second': second,
+      '--minute': minute,
+      '--hour': hour,
+    }
   }
 }
 

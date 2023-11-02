@@ -22,6 +22,7 @@ export interface I18nKeys extends ZmanimI18nKeys {
 }
 
 export interface HebCalInit {
+  date: Date,
   city: string;
   locale: string;
   latitude: number;
@@ -105,7 +106,7 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
     this.i18n['en-GB'] = this.i18n['en-US'];
   }
 
-  date = new Date();
+  date: Date;
 
   locale = 'he-IL';
 
@@ -182,7 +183,18 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
       ?.getFlags() & flags.ROSH_CHODESH;
   }
 
-  constructor({ locale, latitude, longitude, city, tzeitAngle }: HebCalInit) {
+  timeParts: Record<'hour' | 'minute' | 'second' | 'timeZoneName' | 'dayPeriod', string>;
+
+  midnight: Date;
+
+  constructor({ date, locale, latitude, longitude, city, tzeitAngle }: HebCalInit) {
+    this.date = date;
+    this.midnight = new Date(date);
+    this.midnight.setHours(0)
+    this.midnight.setMinutes(0)
+    this.midnight.setSeconds(0)
+    this.midnight.setMilliseconds(0);
+    this.timeParts = this.#getTimeParts();
     this.locale = locale ?? this.locale
     this.latitude = latitude;
     this.longitude = longitude;
@@ -199,6 +211,22 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
     this.eventsToday = this.#getTodayEvents();
     this.eventsTomorrow = this.#getTomorrowEvents();
     this.dailyZmanim = this.#getDailyZmanim();
+  }
+
+  #getTimeParts() {
+    const [
+      { value: hour },
+      { value: minute },
+      { value: second },
+      { value: timeZoneName },
+    ] = new Intl.DateTimeFormat(this.locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZoneName: 'long',
+    }).formatToParts(this.date).filter(x => x.type !== 'literal');
+    const dayPeriod = this.date.getHours() < 12 ? 'am' : 'pm';
+    return { hour, minute, second, timeZoneName, dayPeriod };
   }
 
   #getLocation() {

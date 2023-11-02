@@ -3,6 +3,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import { consume, createContext, provide } from '@lit/context';
 
+import { observes } from '../lib/decorators.js';
+
 import { HebCalDay } from './HebCalDay.js';
 
 import sharedStyles from './shared.css'
@@ -38,6 +40,11 @@ export class HebcalDay extends LitElement {
   @property({ type: Number, attribute: 'havdala-minutes-after-nightfall' })
   accessor havdalaMinutesAfterNightfall: number;
 
+  @property({ type: Date }) accessor date = new Date();
+
+  /** @internal */
+  @state() accessor debugDate: Date | undefined;
+
   @state()
   @provide({ context })
   accessor hayom = this.#getHebcalDay();
@@ -46,12 +53,12 @@ export class HebcalDay extends LitElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    this.#interval = window.setInterval(this.#refresh, 1000);
+    this.#startTicking();
   }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    window.clearInterval(this.#interval)
+    this.#stopTicking();
   }
 
   override render() {
@@ -60,12 +67,40 @@ export class HebcalDay extends LitElement {
     `;
   }
 
-  #refresh = () =>
+  #startTicking() {
+    this.#interval = window.setInterval(this.#tick, 1000);
+
+    this.#tick();
+  }
+
+  #stopTicking() {
+    if (this.#interval)
+      window.clearInterval(this.#interval)
+    this.#interval = undefined;
+  }
+
+  @observes('debugDate')
+  #debugDateChanged(old?: Date) {
+    if (old && !this.debugDate)
+      this.#startTicking();
+    else {
+      this.#stopTicking();
+      this.date = this.debugDate;
+    }
+  }
+
+  @observes('date')
+  #dateChanged() {
     this.hayom = this.#getHebcalDay();
+  }
+
+  #tick = () =>
+    this.date = new Date();
 
   #getHebcalDay() {
-    const { city, longitude, latitude, locale, tzeitAngle } = this;
+    const { city, date, longitude, latitude, locale, tzeitAngle } = this;
     return new HebCalDay({
+      date,
       city, locale, tzeitAngle,
       latitude, longitude,
     });
@@ -77,4 +112,3 @@ export class HebcalDayConsumer extends LitElement {
 
   @consume({ context, subscribe: true }) accessor hayom: HebCalDay;
 }
-
