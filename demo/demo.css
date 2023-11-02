@@ -81,19 +81,3 @@ zmanei-shabbat {
   grid-area: foot;
 }
 
-xtime {
-  display: grid;
-  border-radius: 5px;
-  border: 4px solid black;
-  background: white;
-  padding: 0.5em;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  grid-template-columns: 1fr auto;
-  grid-template-areas:
-    'time date'
-    'time zone';
-}
-
-

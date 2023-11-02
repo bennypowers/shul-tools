@@ -7,11 +7,6 @@
   "main": "index.js",
   "author": "Benny Powers <web@bennypowers.com>",
   "license": "GPL-3.0",
-  "exports": {
-    ".": "./elements/elements.js",
-    "./*": "./elements/*",
-    "./lib/*": "./lib/*"
-  },
   "scripts": {
     "test": "echo 'no tests yet'",
     "start": "wireit",

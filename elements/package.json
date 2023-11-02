@@ -9,6 +9,11 @@
   "scripts": {
     "test": "echo 'no tests yet'"
   },
+  "exports": {
+    ".": "./elements.js",
+    "./lib/*": "./lib/*",
+    "./*": "./*"
+  },
   "publishConfig": {
     "access": "public"
   },

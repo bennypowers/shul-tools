@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import { consume, createContext, provide } from '@lit/context';
 
-import { observes } from '../lib/decorators.js';
+import { observes } from './lib/decorators.js';
 
 import { HebCalDay } from './HebCalDay.js';
 
