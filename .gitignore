@@ -1,9 +1,9 @@
 node_modules
 .wireit
 
-elements/*.js
-elements/*.d.ts
-elements/*.js.map
-!elements/css.d.ts
+elements/**/*.js
+elements/**/*.d.ts
+elements/**/*.js.map
+!elements/lib/css.d.ts
 
 *.tgz
