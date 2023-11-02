@@ -24,7 +24,6 @@ export class ZmaneiYom extends HebcalDayConsumer {
           </dd>
         </div>`)}
       </dl>
-      <slot name="footer"></slot>
     `;
   }
 }
