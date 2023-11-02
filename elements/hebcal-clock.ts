@@ -25,21 +25,20 @@ export class HebcalClock extends HebcalDayConsumer {
   accessor type: 'digital' | 'analogue' = 'digital';
 
   override render() {
-    const { date, locale, hDate } = this.hayom;
-    const { hour, minute, second, dayPeriod, timeZoneName } = this.hayom.timeParts;
+    const { date } = this.hayom;
+    const { hour, minute, second, dayPeriod } = this.hayom.timeParts;
 
     return html`
       <time datetime="${date.toISOString()}"
             style="${styleMap(this.#getTimeStyles())}">${this.type === 'digital' ? html`
         <strong part="time" dir="ltr">
+
           <span part="hour">${hour}</span>
           <span part="colon">:</span>
           <span part="minute">${minute}</span>
           <span part="colon">:</span>
           <span part="second">${second}</span>
-        </strong>
-        <span class="date" part="date">${hDate.render(locale.substring(0, 2))}</span>
-        <small part="zone">${timeZoneName}</small>` : html`
+        </strong>` : html`
         <div id="face"
              class="${classMap({ [dayPeriod]: true })}"
              style="${styleMap(this.#getAngleStyles())}"></div>

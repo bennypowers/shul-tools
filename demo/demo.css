@@ -1,0 +1,99 @@
+
+:root {
+  --root-gap: 24px;
+  --hebcal-row-gap: var(--root-gap);
+  --hebcal-column-gap: calc(var(--root-gap) * 1.6);
+  --hebcal-clock-size: 200px;
+  --hebcal-clock-day-color: #ffefb6;
+  --hebcal-clock-night-color: #053752;
+}
+
+html,
+body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: Tinos, serif;
+}
+
+main, #knobs {
+  padding-inline: 1em;
+  font-size: 200%;
+}
+
+#knobs {
+  display: grid;
+  & button {
+    width: min-content;
+  }
+}
+
+hebcal-day {
+  margin-block: var(--root-gap);
+  font-family: Alef, sans-serif;
+  display: grid;
+  row-gap: var(--hebcal-row-gap);
+  align-content: start;
+  grid-template:
+    'analogue date' auto
+    'yom tefillah' min-content
+    'yom candles' auto
+    'foot foot' auto
+    / auto auto;
+}
+
+hebcal-clock[type="digital"] {
+  column-gap: var(--hebcal-column-gap);
+  grid-area: clock;
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: bold;
+  font-size: 2em;
+}
+
+#date {
+  grid-area: date;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+hebcal-clock[type="analogue"] {
+  grid-area: analogue;
+  width: 300px;
+  height: 300px;
+  place-self: center;
+}
+
+zmanei-yom {
+  grid-area: yom;
+}
+
+zmanei-tefillah {
+  grid-area: tefillah;
+}
+
+zmanei-shabbat {
+  grid-area: candles;
+}
+
+#disclaimer {
+  grid-area: foot;
+}
+
+xtime {
+  display: grid;
+  border-radius: 5px;
+  border: 4px solid black;
+  background: white;
+  padding: 0.5em;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'time date'
+    'time zone';
+}
+
+

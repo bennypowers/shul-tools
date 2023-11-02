@@ -21,13 +21,28 @@ export class ZmaneiTefillah extends HebcalDayConsumer {
   }
 
   render() {
+    const {
+      isShabbat,
+      isChag,
+      isRoshChodesh,
+      isCholHamoed,
+      isWeekday,
+      i18n: {
+        zmaneiTefillah,
+      }
+    } = this.hayom;
+
+    const openSlot =
+        isCholHamoed && !isChag ? 'cholhamoed'
+      : isChag ? 'yomtov'
+      : isRoshChodesh ? 'chodesh'
+      : isShabbat ? 'shabbat'
+      : isWeekday ? 'weekday'
+      : 'error';
+
     return html`
-      <h2 id="heading">${this.hayom?.i18n?.zmaneiTefillah ?? ''}</h2>
-      <slot name="weekday"    ?hidden="${!this.hayom.isWeekday}"></slot>
-      <slot name="shabbat"    ?hidden="${!this.hayom.isShabbat}"></slot>
-      <slot name="yomtov"     ?hidden="${!this.hayom.isChag}"></slot>
-      <slot name="chodesh"    ?hidden="${!this.hayom.isRoshChodesh}"></slot>
-      <slot name="cholhamoed" ?hidden="${!this.hayom.isCholHamoed}"></slot>
+      <h2 id="heading">${zmaneiTefillah ?? ''}</h2>
+      <slot name="${openSlot}"></slot>
     `;
   }
 

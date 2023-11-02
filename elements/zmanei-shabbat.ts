@@ -1,6 +1,5 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
 
 import { HebcalDayConsumer } from './hebcal-day.js';
 
@@ -14,41 +13,57 @@ export class ZmaneiShabbat extends HebcalDayConsumer {
   ]
 
   render() {
-    if (this.hayom?.eventsToday?.length) {
-      const { i18n, isChag, isErevChag, isShabbat, isErevShabbat } = this.hayom;
-      const locale = this.hayom.locale.substring(0, 1);
-      console.log(this.hayom.eventsToday.flatMap(x => x.getCategories()))
-      const lightingTimes = this.hayom.eventsToday.filter(x => x.getCategories().some(y => y === 'candles' || y === 'havdalah'))
-      const parshah = this.hayom.eventsToday.find(x => x.getCategories().some(y => y === 'parashat'))
-      console.log(parshah);
-      let desc = '';
-      if (isShabbat || isErevShabbat)
-        desc += i18n.shabbat;
-      // TODO: eruv tavshillin, etc
-      if ((isShabbat || isErevShabbat) && (isChag || isErevChag))
-        desc += i18n.and;
-      if (isChag || isErevChag)
-        desc += i18n.chag;
-      return html`
-        <slot class="${classMap({ isShabbat, isErevShabbat, isChag, isErevChag })}">
-          <h2>🕯️🕯️ ${i18n.zmanei} ${desc} 🍷
+    const {
+      i18n,
+      isChag,
+      isErevChag,
+      parsha,
+      candles: {
+        lighting,
+        havdalah,
+      }
+    } = this.hayom;
 
-          <strong part="parshah">${parshah?.render(locale) ?? ''}</strong> 📖
-          </h2>
-        </slot>
-        <dl id="events" part="events">${lightingTimes.map(event => html`
-          <dt class="term" part="list term">
-            <span>${event.renderBrief(locale)}</span>
-            <span class="emoji" part="emoji">${event.getEmoji()}</span>
-          </dt>
-          <dd part="list definition">
-            <time datetime="${(event as any).eventTime?.toISOString()}">
-              ${(event as any).eventTimeStr}
-            </time>
-          </dd>`)}
-        </dl>
-      `;
-    }
+    const locale = this.hayom.locale.substring(0, 1);
+
+    let desc = i18n.shabbat;
+
+    // TODO: eruv tavshillin, etc
+
+    if ((isChag || isErevChag))
+      desc += ` ${i18n.and}`;
+
+    if (isChag || isErevChag)
+      desc += i18n.chag;
+
+    return html`
+      <slot>
+        <h2>
+          <span>🍷 ${i18n.zmanei} ${desc}</span>
+          <span part="parshah">📖 ${parsha?.render(locale) ?? ''}</span>
+        </h2>
+      </slot>
+      <dl id="events" part="events">
+        <dt class="term" part="list term lighting">
+          <span>${lighting.renderBrief(locale)}</span>
+          <span class="emoji" part="emoji">${lighting.getEmoji()}</span>
+        </dt>
+        <dd part="list definition lighting">
+          <time datetime="${lighting.eventTime?.toISOString()}">
+            ${lighting.eventTimeStr}
+          </time>
+        </dd>
+        <dt class="term" part="list term havdalah">
+          <span>${havdalah.renderBrief(locale)}</span>
+          <span class="emoji" part="emoji">${havdalah.getEmoji()}</span>
+        </dt>
+        <dd part="list definition havdalah">
+          <time datetime="${havdalah.eventTime.toISOString()}">
+            ${havdalah.eventTimeStr}
+          </time>
+        </dd>
+      </dl>
+    `;
   }
 }
 

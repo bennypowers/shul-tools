@@ -7,121 +7,46 @@
     <script type="importmap">
       {
         "imports": {
-          "@shul/elements": "../elements/elements.js"
-        },
-        "scopes": {
-          "../": {
-            "tslib": "../node_modules/tslib/tslib.es6.js",
-            "lit": "../node_modules/lit/index.js",
-            "lit-html": "../node_modules/lit-html/lit-html.js",
-            "lit-html/": "../node_modules/lit-html/",
-            "lit-element/": "../node_modules/lit-element/",
-            "lit/": "../node_modules/lit/",
-            "@lit/": "../node_modules/@lit/",
-            "@lit/reactive-element": "../node_modules/@lit/reactive-element/reactive-element.js",
-            "@lit/context": "../node_modules/@lit/context/index.js",
-            "@hebcal/core": "../node_modules/@hebcal/core/dist/index.mjs"
-          }
+          "@shul/elements": "../elements/elements.js",
+          "tslib": "../node_modules/tslib/tslib.es6.js",
+          "lit": "../node_modules/lit/index.js",
+          "lit-html": "../node_modules/lit-html/lit-html.js",
+          "lit-html/": "../node_modules/lit-html/",
+          "lit-element/": "../node_modules/lit-element/",
+          "lit/": "../node_modules/lit/",
+          "@lit/": "../node_modules/@lit/",
+          "@lit/reactive-element": "../node_modules/@lit/reactive-element/reactive-element.js",
+          "@lit/context": "../node_modules/@lit/context/index.js",
+          "@hebcal/core": "../node_modules/@hebcal/core/dist/index.mjs"
         }
       }
     </script>
-    <style>
-      :root {
-        --root-gap: 24px;
-        --hebcal-row-gap: var(--root-gap);
-        --hebcal-column-gap: calc(var(--root-gap) * 1.6);
-        --hebcal-clock-size: 200px;
-        --hebcal-clock-day-color: #ffefb6;
-        --hebcal-clock-night-color: #053752;
-      }
-
-      html,
-      body {
-        height: 100%;
-        padding: 0;
-        margin: 0;
-        font-family: Tinos, serif;
-      }
-
-      main, form {
-        padding-inline: 1em;
-        font-size: 200%;
-      }
-
-      hebcal-day {
-        margin-block: var(--root-gap);
-        font-family: Alef, sans-serif;
-        display: grid;
-        row-gap: var(--hebcal-row-gap);
-        align-content: start;
-        grid-template-rows: max-content min-content min-content min-content auto;
-        grid-template-areas:
-          'clock clock'
-          'candles candles'
-          'yom tefillah'
-          'yom analogue'
-          'foot foot'
-      }
-
-      hebcal-clock[type="digital"] {
-        column-gap: var(--hebcal-column-gap);
-        grid-area: clock;
-        &::part(time) {
-          font-family: 'Chakra Petch', sans-serif;
-        }
-      }
-
-      hebcal-clock[type="analogue"] {
-        grid-area: analogue;
-      }
-
-      zmanei-yom {
-        grid-area: yom;
-      }
-
-      zmanei-tefillah {
-        grid-area: tefillah;
-      }
-
-      zmanei-shabbat {
-        grid-area: candles;
-      }
-
-      #disclaimer {
-        grid-area: foot;
-      }
-
-    </style>
-    <script type="module">
-      import '@shul/elements';
-      const hebcal = document.getElementById('hebcal');
-      const analogue = document.getElementById('analogue');
-      const knobs = document.getElementById('knobs');
-      function sync() {
-        const date = new Date(knobs.elements.date.value);
-        if (date.toString() !== 'Invalid Date')
-          hebcal.debugDate = date;
-        else
-          hebcal.debugDate = undefined;
-        if (knobs.elements.clockSize.value !== '')
-          analogue.style.setProperty('width', knobs.elements.clockSize.value + '%');
-      }
-      knobs.addEventListener('input', sync);
-      knobs.addEventListener('reset', sync);
-      sync();
-    </script>
+    <link rel="stylesheet" href="demo.css">
+    <script type="module" src="demo.js"></script>
   </head>
   <body>
     <header lang="en" dir="ltr">
       <form id="knobs">
         <label>Debug date
-          <input name="date" type="datetime-local">
+          <input id="abs" type="number">
+          <input id="dateknob" name="date" type="datetime-local">
         </label>
-        <button type="reset">Reset</button>
+
+        <label>Date in Gematriya
+          <input name="gematriya" type="checkbox" checked>
+        </label>
+
+        <label>Tzeit angle
+          <input name="tzeit" type="number" value="8.3">
+        </label>
+
         <label>Clock size
           <input name="clockSize" type="range" value="100">
         </label>
-        <button type="reset">Reset</button>
+
+        <button type="reset">
+          Reset
+        </button>
       </form>
     </header>
     <main>
@@ -129,11 +54,18 @@
                   city="Jerusalem"
                   latitude="31.80290"
                   longitude="32.24075"
+                  tzeit-angle="8.3"
                   candles-minutes-before-sundown="40">
 
-        <hebcal-clock type="digital"></hebcal-clock>
-
         <hebcal-clock id="analogue" type="analogue"></hebcal-clock>
+
+        <div id="date">
+          <hebcal-clock type="digital"></hebcal-clock>
+          <hebcal-date id="hdate" gematriya></hebcal-date>
+          <hebcal-timezone></hebcal-timezone>
+        </div>
+
+        <zmanei-yom></zmanei-yom>
 
         <zmanei-tefillah>
           <strong slot="weekday">שחרית</strong>
@@ -150,50 +82,62 @@
             15 דקות לפני השקיעה
           </time>
 
-          <strong slot="shabbat">שחרית</strong>
+          <strong slot="shabbat">שחרית לשבת</strong>
           <time slot="shabbat"
                 datetime="08:00"
                 data-tefillah="שחרית">
             08:00
           </time>
-          <strong slot="shabbat">מנחה מעריב</strong>
+          <strong slot="shabbat">מנחה מעריב בשבת</strong>
           <time slot="shabbat"
-                datetime="08:00"
+                data-offset="-70"
+                data-offset-from="tzeit"
                 data-tefillah="מנחה מעריב">
           </time>
 
-          <strong slot="yomtov">שחרית</strong>
+          <strong slot="yomtov">שחרית יום טוב</strong>
           <time slot="yomtov"
                 datetime="08:00"
                 data-tefillah="שחרית">
             08:00
           </time>
-          <strong slot="shabbat">מנחה מעריב</strong>
+          <strong slot="yomtov">מנחה מעריב יום טוב</strong>
           <time slot="yomtov"
                 datetime="08:00"
                 data-tefillah="מנחה מעריב">
           </time>
 
-          <strong slot="yomtov">שחרית</strong>
+          <strong slot="chodesh">שחרית ראש חודש</strong>
           <time slot="chodesh"
                 datetime="06:15"
                 data-tefillah="שחרית">
             06:15
           </time>
 
-          <strong slot="yomtov">שחרית</strong>
+          <strong slot="chodesh">מנחה מעריב ראש חודש</strong>
+          <time slot="chodesh"
+                data-offset="-15"
+                data-offset-from="sunset"
+                data-tefillah="מנחה מעריב">
+            15 דקות לפני השקיעה
+          </time>
+
+          <strong slot="cholhamoed">שחרית חול המועד</strong>
           <time slot="cholhamoed"
                 datetime="07:00"
                 data-tefillah="שחרית">
             07:00
           </time>
+          <strong slot="cholhamoed">מנחה מעריב חול המועד</strong>
+          <time slot="cholhamoed"
+                datetime="08:00"
+                data-tefillah="מנחה מעריב">
+          </time>
         </zmanei-tefillah>
-
-        <daf-yomi></daf-yomi>
 
         <zmanei-shabbat></zmanei-shabbat>
 
-        <zmanei-yom></zmanei-yom>
+        <daf-yomi></daf-yomi>
 
         <small id="disclaimer">
           הזמנים חושבו לפי מיקום המדויק של בית הכנסת

@@ -2,36 +2,8 @@
   display: block;
 }
 
-:host([type="digital" i]) {
-  display: grid;
-  border-radius: 5px;
-  border: 4px solid black;
-  background: white;
-  padding: 0.5em;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  grid-template-columns: 1fr auto;
-  grid-template-areas:
-    'time date'
-    'time zone';
-}
-
 [part=time] {
-  grid-area: time;
-  justify-self: start;
   font-weight: 500;
-}
-
-[part=date] {
-  grid-area: date;
-  font-size: 1.2em;
-}
-
-[part=zone] {
-  grid-area: zone;
-  font-weight: 100;
-  font-size: .8em;
 }
 
 time {
@@ -113,8 +85,8 @@ strong {
     display: block;
     position: absolute;
     width: var(--s);
-    top: calc(50cqw - var(--s) + var(--q));
-    left: calc(50cqw - var(--s) / 2 - var(--q));
+    top: calc(50cqw - var(--s) + var(--q) + 1cqw);
+    left: calc(50cqw - var(--s) / 2 - var(--q) - 1cqw);
     content: " ";
     background: white;
     border-radius: 100%;
@@ -164,7 +136,6 @@ strong {
   position: absolute;
   top: 50cqw;
   transform-origin: center 0;
-  left: calc(50cqw - var(--width) / 2);
   width: var(--width);
   height: var(--height);
   background-color: currentcolor;
@@ -181,6 +152,7 @@ strong {
   --height: 45cqw;
   color: var(--second-hand-color, grey);
   border-color: var(--second-hand-color, grey);
+  left: calc(50cqw - var(--width) / 1 - 2cqw);
 }
 
 #minute {
@@ -188,6 +160,7 @@ strong {
   --height: 40cqw;
   color: var(--minute-hand-color, white);
   border-color: var(--hour-hand-color, black);
+  left: calc(50cqw - var(--width) / 1 - 1.5cqw);
 }
 
 #hour {
@@ -195,6 +168,7 @@ strong {
   --height: 25cqw;
   color: var(--hour-hand-color, black);
   border-color: var(--minute-hand-color, white);
+  left: calc(50cqw - var(--width) / 1);
 }
 
 #second.hand { rotate: var(--_second); }

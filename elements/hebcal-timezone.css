@@ -1,0 +1,10 @@
+:host {
+  display: block;
+  font-weight: 100;
+  font-size: .8em;
+}
+
+time {
+  display: contents;
+}
+

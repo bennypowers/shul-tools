@@ -1,11 +1,74 @@
 import {
+  type Event as HebCalEvent,
   HDate,
   HebrewCalendar,
   Location as HebCalLocation,
   Zmanim,
-  Event as HebCalEvent,
-  flags,
+  ParshaEvent,
+  CandleLightingEvent,
+  HavdalahEvent,
 } from '@hebcal/core';
+
+/**
+ * Holiday flags for Event.
+ * copied from hebcal src because i hate typescript sometimes
+ * @readonly
+ * @enum {number}
+ */
+const flags = {
+  /** Chag, yontiff, yom tov */
+  CHAG: 0x000001,
+  /** Light candles 18 minutes before sundown */
+  LIGHT_CANDLES: 0x000002,
+  /** End of holiday (end of Yom Tov)  */
+  YOM_TOV_ENDS: 0x000004,
+  /** Observed only in the Diaspora (chutz l'aretz)  */
+  CHUL_ONLY: 0x000008,
+  /** Observed only in Israel */
+  IL_ONLY: 0x000010,
+  /** Light candles in the evening at Tzeit time (3 small stars) */
+  LIGHT_CANDLES_TZEIS: 0x000020,
+  /** Candle-lighting for Chanukah */
+  CHANUKAH_CANDLES: 0x000040,
+  /** Rosh Chodesh, beginning of a new Hebrew month */
+  ROSH_CHODESH: 0x000080,
+  /** Minor fasts like Tzom Tammuz, Ta'anit Esther, ... */
+  MINOR_FAST: 0x000100,
+  /** Shabbat Shekalim, Zachor, ... */
+  SPECIAL_SHABBAT: 0x000200,
+  /** Weekly sedrot on Saturdays */
+  PARSHA_HASHAVUA: 0x000400,
+  /** Daily page of Talmud (Bavli) */
+  DAF_YOMI: 0x000800,
+  /** Days of the Omer */
+  OMER_COUNT: 0x001000,
+  /** Yom HaShoah, Yom HaAtzma'ut, ... */
+  MODERN_HOLIDAY: 0x002000,
+  /** Yom Kippur and Tish'a B'Av */
+  MAJOR_FAST: 0x004000,
+  /** On the Saturday before Rosh Chodesh */
+  SHABBAT_MEVARCHIM: 0x008000,
+  /** Molad */
+  MOLAD: 0x010000,
+  /** Yahrzeit or Hebrew Anniversary */
+  USER_EVENT: 0x020000,
+  /** Daily Hebrew date ("11th of Sivan, 5780") */
+  HEBREW_DATE: 0x040000,
+  /** A holiday that's not major, modern, rosh chodesh, or a fast day */
+  MINOR_HOLIDAY: 0x080000,
+  /** Evening before a major or minor holiday */
+  EREV: 0x100000,
+  /** Chol haMoed, intermediate days of Pesach or Sukkot */
+  CHOL_HAMOED: 0x200000,
+  /** Mishna Yomi */
+  MISHNA_YOMI: 0x400000,
+  /** Yom Kippur Katan, minor day of atonement on the day preceeding each Rosh Chodesh */
+  YOM_KIPPUR_KATAN: 0x800000,
+  /** Daily page of Jerusalem Talmud (Yerushalmi) */
+  YERUSHALMI_YOMI: 0x1000000,
+  /** Nach Yomi */
+  NACH_YOMI: 0x2000000
+};
 
 export type ZmanimKey = typeof HebCalDay.ZMANIM_KEYS[number];
 
@@ -19,6 +82,7 @@ export interface I18nKeys extends ZmanimI18nKeys {
   yom: string;
   and: string;
   zmaneiTefillah: string;
+  days: string[];
 }
 
 export interface HebCalInit {
@@ -30,11 +94,29 @@ export interface HebCalInit {
   tzeitAngle: number;
 }
 
+export interface CandleLightingInfo {
+  categories: string[];
+  lighting: CandleLightingEvent;
+  havdalah: HavdalahEvent
+}
+
 export interface DailyZman {
   key: ZmanimKey,
   date: Date,
   past: boolean,
   next: boolean,
+}
+
+function isParshaEvent(x: HebCalEvent): x is ParshaEvent {
+  return x instanceof ParshaEvent;
+}
+
+function isCandleLightingEvent(x: HebCalEvent): x is CandleLightingEvent {
+  return x instanceof CandleLightingEvent;
+}
+
+function isHavdalahEvent(x: HebCalEvent): x is HavdalahEvent {
+  return x instanceof HavdalahEvent;
 }
 
 export class HebCalDay implements Record<ZmanimKey, Date> {
@@ -77,6 +159,15 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
       yom: 'יום',
       and: 'ו',
       zmaneiTefillah: 'זמני תפילה',
+      days: [
+        'יום ראשון',
+        'יום שני',
+        'יום שלישי',
+        'יום רביעי',
+        'יום חמישי',
+        'יום שישי',
+        'יום שבת קודש',
+      ]
     },
     'en-US': {
       alotHaShachar: 'dawn',
@@ -97,6 +188,15 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
       yom: 'Today',
       and: 'and ',
       zmaneiTefillah: 'Prayer times',
+      days: [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Shabbat',
+      ]
     }
   }
 
@@ -135,6 +235,10 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
 
   nextHDate: HDate;
 
+  parsha: ParshaEvent;
+
+  candles: CandleLightingInfo;
+
   #location: HebCalLocation
 
   #zmanim: Zmanim;
@@ -152,21 +256,11 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
   get isErevShabbat() { return this.hDate.getDay() === 5; }
 
   get isChag() {
-    for (const event of this.eventsToday) {
-      if (event.getFlags() & flags.CHAG)
-        return true
-    }
-    return false;
+    return this.eventsToday.length && this.eventsToday.every(x => x.mask & flags.CHAG);
   }
 
   get isErevChag() {
-    if (!this.isChag)
-      return false;
-    for (const event of this.eventsToday) {
-      if (event.getFlags() & flags.EREV)
-        return true
-    }
-    return false;
+    return this.eventsToday.length && this.eventsToday.every(x => x.mask & flags.EREV & flags.CHAG);
   }
 
   get isWeekday() {
@@ -174,13 +268,11 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
   }
 
   get isRoshChodesh() {
-    return this.eventsToday.at(0)
-      ?.getFlags() & flags.ROSH_CHODESH;
+    return this.eventsToday.length && this.eventsToday.every(x => x.mask & flags.ROSH_CHODESH);
   }
 
   get isCholHamoed() {
-    return this.eventsToday.at(0)
-      ?.getFlags() & flags.ROSH_CHODESH;
+    return this.eventsToday.length && this.eventsToday.every(x => x.mask & flags.CHOL_HAMOED);
   }
 
   timeParts: Record<'hour' | 'minute' | 'second' | 'timeZoneName' | 'dayPeriod', string>;
@@ -211,6 +303,8 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
     this.eventsToday = this.#getTodayEvents();
     this.eventsTomorrow = this.#getTomorrowEvents();
     this.dailyZmanim = this.#getDailyZmanim();
+    this.parsha = this.#getParshah();
+    this.candles = this.#getCandles();
   }
 
   #getTimeParts() {
@@ -253,10 +347,11 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
     );
   }
 
-  #getEvents(start = this.date, end = this.date): HebCalEvent[] {
+  #getEvents(start = this.hDate): HebCalEvent[] {
     const location = this.#location;
     /** Hebcals' locale isn't an iso locale, but a pronunciation hint */
     const locale = this.locale.match(/^(he|en)$/) ? this.locale : 'he';
+    const end = start;
     return HebrewCalendar.calendar({
       location,
       start, end,
@@ -283,9 +378,7 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
   }
 
   #getTomorrowEvents(): HebCalEvent[] {
-    const date = new Date(this.date);
-          date.setDate(date.getDate() + 1);
-    return this.#getEvents(this.date, date);
+    return this.#getEvents(this.hDate.add(1));
   }
 
   #getDailyZmanim(): DailyZman[] {
@@ -305,6 +398,33 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
         next,
       }
     });
+  }
+
+  #getParshah(): ParshaEvent {
+    let parsha: ParshaEvent;
+    let check = this.hDate;
+    while (!(parsha = this.#getEvents(check).find(isParshaEvent)))
+      check = check.add(1);
+    return parsha;
+  }
+
+  // TODO: rosh hashannnah meshulash
+  #getCandles(): CandleLightingInfo {
+    let lighting: CandleLightingEvent;
+    let check = this.hDate;
+    while (!lighting) {
+      lighting = this.#getEvents(check).find(isCandleLightingEvent);
+      check = check.add(1);
+    }
+
+    const categories = lighting.getCategories();
+    const havdalah = this.#getEvents(check).find(isHavdalahEvent)
+
+    return {
+      categories,
+      lighting,
+      havdalah,
+    };
   }
 }
 
