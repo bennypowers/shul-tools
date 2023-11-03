@@ -1,0 +1,27 @@
+name: Pages
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          mkdir -p public/node_modules
+          cp demo/* public/
+          cp -r node_modules public/
+          cp -r elements public/node_modules/
+          sed -i 's/\.\.\/elements/\.\/node_modules/elements/' public/index.html
+          sed -i 's/\.\.\/node_modules/\.\/node_modules/' public/index.html
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
