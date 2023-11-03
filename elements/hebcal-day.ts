@@ -12,6 +12,8 @@ import sharedStyles from './shared.css'
 import styles from './hebcal-day.css';
 
 import childStyles from './hebcal-consumer.css';
+import { ClockController } from './lib/ClockController.js';
+import { DateConverter } from './lib/DateConverter.js';
 
 const context = createContext<HebCalDay>('hebcal');
 
@@ -19,47 +21,83 @@ const context = createContext<HebCalDay>('hebcal');
 export class HebcalDay extends LitElement {
   static styles = [sharedStyles, styles];
 
+  /**
+   * Locale for translating strings.
+   * Currently, `he-IL` and `en-US` are supported.
+   */
   @property()
   accessor locale = 'he-IL'
 
+  /**
+   * City whence to lookup zmanim
+   * @see https://github.com/hebcal/hebcal-es6/tree/main#locationlookupname--location
+   */
   @property()
   accessor city = 'Jerusalem';
 
+  /** setting latitude and longitude overrides `city` */
   @property({ type: Number })
   accessor latitude: number | undefined;
 
+  /** setting latitude and longitude overrides `city` */
   @property({ type: Number })
   accessor longitude: number | undefined;
 
-  @property({ type: Number, attribute: 'tzeit-angle' })
-  accessor tzeitAngle: number | undefined;
+  /**
+   * Angle at which to establish nightfall
+   * @see https://github.com/hebcal/hebcal-es6/tree/main#zmanimtzeitangle--date
+   */
+  @property({
+    type: Number,
+    attribute: 'tzeit-degrees',
+  }) accessor tzeitDegrees: number | undefined;
 
-  @property({ type: Number, attribute: 'candles-minutes-before-sundown' })
-  accessor candlesMinutesBeforeSundown: number;
+  /**
+   * Number of minutes before *shkia* when Shabbat candles are lit.
+   * Customarily 18 minutes outside of Jerusalem, and 40 minutes in Jerusalem
+   */
+  @property({
+    type: Number,
+    attribute: 'candle-lighting-minutes-before-sunset',
+  }) accessor candleLightingMinutesBeforeSunset: 18 | 40;
 
-  @property({ type: Number, attribute: 'havdala-minutes-after-nightfall' })
-  accessor havdalaMinutesAfterNightfall: number;
+  /**
+   * Number of minutes after sunset when Shabbat is customarily ended.
+   */
+  @property({
+    type: Number,
+    attribute: 'havdalah-minutes-after-sunset',
+  }) accessor havdalahMinutesAfterSunset = 0;
 
-  @property({ type: Date }) accessor date = new Date();
+  @property({
+    type: Number,
+    attribute: 'havdalah-degrees',
+  }) accessor havdalahDegrees = 0;
+
+  /**
+   * When set, hebcal elements will display information for the specific date
+   */
+  @property({
+    converter: DateConverter,
+    reflect: true,
+    attribute: 'specific-date',
+  }) accessor specificDate: Date | undefined;
 
   /** @internal */
-  @state() accessor debugDate: Date | undefined;
+  #clock = new ClockController(this, '#clock' as keyof HebcalDay);
 
+  @property({ reflect: true, type: Boolean })
+  accessor debug = false;
+
+  /**
+   * Shared object representing the current (or selected) Hebrew calendar day
+   */
   @state()
   @provide({ context })
   accessor hayom = this.#getHebcalDay();
 
-  #interval?:number;
-
-  override connectedCallback() {
-    super.connectedCallback();
-    this.#startTicking();
-  }
-
-  override disconnectedCallback() {
-    super.disconnectedCallback();
-    this.#stopTicking();
-  }
+  get date() { return this.#clock.date; }
+  set date(date: Date) { this.#clock.set(date); }
 
   override render() {
     return html`
@@ -67,42 +105,48 @@ export class HebcalDay extends LitElement {
     `;
   }
 
-  #startTicking() {
-    this.#interval = window.setInterval(this.#tick, 1000);
-
-    this.#tick();
-  }
-
-  #stopTicking() {
-    if (this.#interval)
-      window.clearInterval(this.#interval)
-    this.#interval = undefined;
-  }
-
-  @observes('debugDate')
-  #debugDateChanged(old?: Date) {
-    if (old && !this.debugDate)
-      this.#startTicking();
-    else {
-      this.#stopTicking();
-      this.date = this.debugDate;
+  @observes('specificDate') #debugDateChanged(old: { specificDate?: Date }) {
+    if (old.specificDate && !this.specificDate) {
+      this.#clock.reset();
+      this.#clock.start();
+    } else {
+      this.#clock.stop();
+      this.#clock.set(this.specificDate);
+      this.requestUpdate('#clock' as keyof HebcalDay, old.specificDate);
     }
   }
 
-  @observes('date')
-  #dateChanged() {
+  @observes(
+    '#clock' as keyof HebcalDay,
+    'candleLightingMinutesBeforeSunset',
+    'date',
+    'debug',
+    'havdalahDegrees',
+    'havdalahMinutesAfterSunset',
+    'tzeitDegrees',
+  ) #dateChanged() {
     this.hayom = this.#getHebcalDay();
   }
 
-  #tick = () =>
-    this.date = new Date();
-
   #getHebcalDay() {
-    const { city, date, longitude, latitude, locale, tzeitAngle } = this;
+    const {
+      date, debug,
+      city, longitude, latitude, locale,
+      tzeitDegrees,
+      candleLightingMinutesBeforeSunset,
+    } = this;
+    const havdalahMins = this.havdalahMinutesAfterSunset || undefined;
+    const havdalahDeg = this.havdalahDegrees || undefined;
     return new HebCalDay({
       date,
-      city, locale, tzeitAngle,
+      debug,
+      city, locale,
       latitude, longitude,
+
+      tzeitDeg: tzeitDegrees,
+      candleLightingMins: candleLightingMinutesBeforeSunset,
+      havdalahMins,
+      havdalahDeg,
     });
   }
 }
@@ -110,5 +154,15 @@ export class HebcalDay extends LitElement {
 export class HebcalDayConsumer extends LitElement {
   static styles = [sharedStyles, childStyles];
 
-  @consume({ context, subscribe: true }) accessor hayom: HebCalDay;
+  /**
+   * Shared object representing the current (or selected) Hebrew calendar day
+   */
+  @consume({ context, subscribe: true })
+  accessor hayom: HebCalDay;
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'hebcal-day': HebcalDay;
+  }
 }

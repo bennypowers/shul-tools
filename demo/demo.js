@@ -1,3 +1,5 @@
+// @ts-check
+
 import { HDate } from '@hebcal/core';
 import '@shul/elements';
 
@@ -7,44 +9,80 @@ await Promise.all([
 ].map(x => customElements.whenDefined(x)));
 
 const $ = x => document.getElementById(x);
-const hebcal = $('hebcal');
-const analogue = $('analogue');
-const knobs = $('knobs');
-const dateknob = $('dateknob');
-const abs = $('abs');
-const hdate = $('hdate');
+
+const hebcal =
+  /** @type {HTMLElementTagNameMap['hebcal-day']} */ ($('day'));
+
+const analogue =
+  /** @type {HTMLElementTagNameMap['hebcal-clock']} */ ($('analogue'));
+
+const knobs =
+  /** @type {HTMLFormElement} */ ($('knobs'));
 
 function sync(event) {
-  if (event?.target === abs) {
-    const date = new HDate(parseInt(event.data)).greg();
-    dateknob.valueAsDate = date;
-    hebcal.debugDate = date;
-  } else {
-    const date = new Date(knobs.elements.date.value);
+  const dateknob = /** @type {HTMLInputElement} */(knobs.elements.namedItem('date'));
+  const absknob = /** @type {HTMLInputElement} */(knobs.elements.namedItem('abs'));
+  const absDateValue = absknob.value;
 
-    if (date.toString() !== 'Invalid Date')
-      hebcal.debugDate = date;
-    else
-      hebcal.debugDate = undefined;
-    if (knobs.elements.clockSize.value !== '' && knobs.elements.clockSize.value !== '100')
-      analogue.style.setProperty('width', knobs.elements.clockSize.value + '%');
-    else
-      analogue.style.removeProperty('width');
+  const absDate =
+        absDateValue
+     && new HDate(parseInt(absDateValue)).greg()
+     || null;
 
-    if (knobs.elements.tzeit.value)
-      hebcal.tzeitAngle = parseFloat(knobs.elements.tzeit.value);
+  absDate?.setUTCHours(0);
 
-    if (hebcal.debugDate)
-      abs.value = new HDate(hebcal.debugDate).abs();
-    else
-      abs.value = new HDate(new Date()).abs();
+  switch (event?.target) {
+    case absknob:
+      dateknob.valueAsDate = absDate;
+      break;
+    case dateknob:
+      absknob.value = new HDate(/**@type{Date}*/(dateknob.valueAsDate)).abs().toString();
+      break;
+  }
 
-    hdate.gematriya = knobs.elements.gematriya.checked;
+  if (!absknob.value)
+    absknob.value = new HDate(new Date()).abs().toString();
+
+  const date = (
+    dateknob.valueAsDate?.toString() === 'Invalid Date' ? null : dateknob.valueAsDate
+  ) ?? undefined;
+
+  hebcal.specificDate = date;
+
+  const clockSize = /** @type {HTMLInputElement} */(knobs.elements.namedItem('clockSize')).value;
+  if (clockSize !== '' && clockSize !== '100')
+    analogue.style.setProperty('width', `${clockSize}%`);
+  else
+    analogue.style.removeProperty('width');
+
+  for (const element of knobs.elements) {
+    if (element instanceof HTMLInputElement) {
+      const target = $(element.dataset.target);
+      if (target) {
+        target[element.name] =
+            element.type === 'number' ? parseFloat(element.value)
+          : element.type === 'checkbox' ? element.checked
+          : element.value
+      } else if (element.dataset?.target) {
+        console.warn(`Could not find target #${element.dataset.target}`);
+      }
+    }
   }
 }
 
 knobs.addEventListener('input', sync);
-knobs.addEventListener('reset', sync);
+
+knobs.addEventListener('reset', async function() {
+  await hebcal.updateComplete;
+  await new Promise(requestAnimationFrame);
+  sync();
+});
+
+knobs.addEventListener('select', () => {
+  return hebcal.city =
+    /** @type {HTMLInputElement} */
+    (knobs.elements.namedItem('city')).value;
+});
 
 await hebcal.updateComplete;
 await analogue.updateComplete;

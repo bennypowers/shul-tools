@@ -1,3 +1,5 @@
+import type { ZmanimKey } from './HebCal.js';
+
 import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -63,7 +65,8 @@ export class HebcalClock extends HebcalDayConsumer {
     `;
   }
 
-  #calcAngle(date: Date): string {
+  #calcAngle(key: ZmanimKey): string {
+    const date = this.hayom.dailyZmanim.get(key);
     const ms = date.getTime();
     const epochMidnight = this.hayom.midnight.getTime();
     const hourOffset = this.hayom.timeParts.dayPeriod === 'pm' ? 12 : 0;
@@ -79,12 +82,12 @@ export class HebcalClock extends HebcalDayConsumer {
     if (this.type === 'digital') return {}
     switch (this.hayom.timeParts.dayPeriod) {
       case 'am': return {
-        '--angle-twilight-start': this.#calcAngle(this.hayom.alotHaShachar),
-        '--angle-twilight-end': this.#calcAngle(this.hayom.sunrise),
+        '--angle-twilight-start': this.#calcAngle('alotHaShachar'),
+        '--angle-twilight-end': this.#calcAngle('sunrise'),
       };
       case 'pm': return {
-        '--angle-twilight-start': this.#calcAngle(this.hayom.sunset),
-        '--angle-twilight-end': this.#calcAngle(this.hayom.tzeit),
+        '--angle-twilight-start': this.#calcAngle('sunset'),
+        '--angle-twilight-end': this.#calcAngle('tzeit'),
       };
     }
   }
@@ -99,3 +102,8 @@ export class HebcalClock extends HebcalDayConsumer {
   }
 }
 
+declare global {
+  interface HTMLElementTagNameMap {
+    'hebcal-clock': HebcalClock;
+  }
+}

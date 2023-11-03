@@ -6,7 +6,7 @@ import { classMap } from 'lit/directives/class-map.js';
 @customElement('zmanei-yom')
 export class ZmaneiYom extends HebcalDayConsumer {
   render() {
-    const { dailyZmanim, i18n, locale, tzeitAngle } = this.hayom ?? {};
+    const { dailyZmanim, i18n, locale, tzeitDeg } = this.hayom ?? {};
     return html`
       <heading>
         <h2>${i18n?.zmanei ?? ''} ${i18n?.yom ?? ''}</h2>
@@ -15,7 +15,7 @@ export class ZmaneiYom extends HebcalDayConsumer {
         <div class="${classMap({ past, next })}">
           <dt part="list term">
             <span>${i18n[key]}</span>${key !== 'tzeit' ? '' : html`
-            <small>(${tzeitAngle}°)</small>`}
+            <small>(${tzeitDeg}°)</small>`}
           </dt>
           <dd part="list definition">
             <time datetime="${date.toISOString()}">

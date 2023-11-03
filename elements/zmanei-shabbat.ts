@@ -36,6 +36,9 @@ export class ZmaneiShabbat extends HebcalDayConsumer {
     if (isChag || isErevChag)
       desc += i18n.chag;
 
+    if (!havdalah)
+      console.log(this.hayom.hDate)
+
     return html`
       <slot>
         <h2>
@@ -51,7 +54,7 @@ export class ZmaneiShabbat extends HebcalDayConsumer {
         <dd part="list definition lighting">
           <time datetime="${lighting.eventTime?.toISOString()}">
             ${lighting.eventTimeStr}
-          </time>
+          </time>${this.#dump(lighting.eventTime)}
         </dd>
         <dt class="term" part="list term havdalah">
           <span>${havdalah.renderBrief(locale)}</span>
@@ -60,10 +63,15 @@ export class ZmaneiShabbat extends HebcalDayConsumer {
         <dd part="list definition havdalah">
           <time datetime="${havdalah.eventTime.toISOString()}">
             ${havdalah.eventTimeStr}
-          </time>
+          </time>${this.#dump(havdalah.eventTime)}
         </dd>
       </dl>
     `;
+  }
+
+  #dump(obj: unknown) {
+    return !this.hayom.debug ? ''
+    : html`<pre dir="ltr" lang="en">${JSON.stringify(obj, null, 2)}</pre>`
   }
 }
 

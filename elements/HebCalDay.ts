@@ -70,7 +70,7 @@ const flags = {
   NACH_YOMI: 0x2000000
 };
 
-export type ZmanimKey = typeof HebCalDay.ZMANIM_KEYS[number];
+export type ZmanimKey = typeof DailyZmanim.ZMANIM_KEYS[number];
 
 export type ZmanimI18nKeys =
   Record<ZmanimKey, string>;
@@ -85,14 +85,22 @@ export interface I18nKeys extends ZmanimI18nKeys {
   days: string[];
 }
 
-export interface HebCalInit {
+interface HebCalInitBase {
+  debug?: boolean;
   date: Date,
   city: string;
   locale: string;
   latitude: number;
   longitude: number;
-  tzeitAngle: number;
+  tzeitDeg: number;
+  candleLightingMins: number,
 }
+
+export type HebCalInit = HebCalInitBase & ({
+  havdalahMins: number,
+} | {
+  havdalahDeg: number,
+});
 
 export interface CandleLightingInfo {
   categories: string[];
@@ -100,8 +108,7 @@ export interface CandleLightingInfo {
   havdalah: HavdalahEvent
 }
 
-export interface DailyZman {
-  key: ZmanimKey,
+export interface ZmanInfo {
   date: Date,
   past: boolean,
   next: boolean,
@@ -119,11 +126,12 @@ function isHavdalahEvent(x: HebCalEvent): x is HavdalahEvent {
   return x instanceof HavdalahEvent;
 }
 
-export class HebCalDay implements Record<ZmanimKey, Date> {
-  static readonly THREE_MEDIUM_STARS = 7.083;
 
-  static readonly THREE_SMALL_STARS = 8.5;
+const THREE_MEDIUM_STARS = 7.083;
 
+const THREE_SMALL_STARS = 8.5;
+
+class DailyZmanim {
   static readonly ZMANIM_KEYS = [
     'alotHaShachar',
     'misheyakir',
@@ -139,7 +147,69 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
     'tzeit',
   ] as const;
 
-  static i18n: Record<string, I18nKeys> = {
+  readonly alotHaShachar: Date;
+
+  readonly misheyakir: Date;
+
+  readonly sunrise: Date;
+
+  readonly sofZmanShmaMGA: Date;
+
+  readonly sofZmanShma: Date;
+
+  readonly sofZmanTfillaMGA: Date;
+
+  readonly sofZmanTfilla: Date;
+
+  readonly minchaGedola: Date;
+
+  readonly minchaKetana: Date;
+
+  readonly plagHaMincha: Date;
+
+  readonly sunset: Date;
+
+  readonly tzeit: Date;
+
+  #keys = new Map<ZmanimKey, ZmanInfo>();
+
+  constructor(
+    now: Date,
+    lat: number,
+    long: number,
+    tzeitDeg = THREE_MEDIUM_STARS,
+  ) {
+    const zmanim = new Zmanim(now, lat, long);
+    let lastSeenIsPast = false
+    for (const key of DailyZmanim.ZMANIM_KEYS) {
+      const date = zmanim[key](...key === 'tzeit' ? [tzeitDeg] : []);
+      const past = date < now;
+      const next = lastSeenIsPast && !past;
+      lastSeenIsPast = past && !next
+      this.#keys.set(key, { date, past, next });
+    }
+  }
+
+  get(key: ZmanimKey) { return this.#keys.get(key)?.date; }
+
+  isPast(key: ZmanimKey) { return this.#keys.get(key)?.past; }
+
+  isNext(key: ZmanimKey) { return this.#keys.get(key)?.next; }
+
+  map<A>(fn: (
+    x?: ZmanInfo & { key: ZmanimKey },
+    i?: number,
+    a?: (ZmanInfo & { key: ZmanimKey })[],
+  ) => A): A[] {
+    return Array.from(
+      this.#keys.entries(),
+      ([key, { date, next, past }]) => ({ key, date, next, past }),
+    ).map(fn);
+  }
+}
+
+export class HebCalDay {
+  static readonly i18n: Record<string, I18nKeys> = {
     'he-IL': {
       alotHaShachar: 'עלות השחר',
       misheyakir: 'משיכיר',
@@ -206,6 +276,8 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
     this.i18n['en-GB'] = this.i18n['en-US'];
   }
 
+  debug = false;
+
   date: Date;
 
   locale = 'he-IL';
@@ -216,38 +288,31 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
 
   longitude: number;
 
-  tzeitAngle = HebCalDay.THREE_SMALL_STARS;
+  tzeitDeg = THREE_SMALL_STARS;
 
-  alotHaShachar: Date;
-  misheyakir: Date;
-  sunrise: Date;
-  sofZmanShmaMGA: Date;
-  sofZmanShma: Date;
-  sofZmanTfillaMGA: Date;
-  sofZmanTfilla: Date;
-  minchaGedola: Date;
-  minchaKetana: Date;
-  plagHaMincha: Date;
-  sunset: Date;
-  tzeit: Date;
+  candleLightingMins: number;
 
-  hDate: HDate;
+  havdalahMins: number;
 
-  nextHDate: HDate;
+  havdalahDeg: number;
 
-  parsha: ParshaEvent;
+  readonly hDate: HDate;
 
-  candles: CandleLightingInfo;
+  readonly nextHDate: HDate;
 
-  #location: HebCalLocation
+  readonly parsha: ParshaEvent;
 
-  #zmanim: Zmanim;
+  readonly candles: CandleLightingInfo;
 
-  dailyZmanim: DailyZman[];
+  readonly dailyZmanim: DailyZmanim;
 
-  eventsToday: HebCalEvent[];
+  readonly eventsToday: HebCalEvent[];
 
-  eventsTomorrow: HebCalEvent[];
+  readonly eventsTomorrow: HebCalEvent[];
+
+  readonly timeParts: Record<'hour' | 'minute' | 'second' | 'timeZoneName' | 'dayPeriod', string>;
+
+  readonly midnight: Date;
 
   get i18n() { return HebCalDay.i18n[this.locale]; }
 
@@ -275,31 +340,39 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
     return this.eventsToday.length && this.eventsToday.every(x => x.mask & flags.CHOL_HAMOED);
   }
 
-  timeParts: Record<'hour' | 'minute' | 'second' | 'timeZoneName' | 'dayPeriod', string>;
+  #location: HebCalLocation
 
-  midnight: Date;
-
-  constructor({ date, locale, latitude, longitude, city, tzeitAngle }: HebCalInit) {
-    this.date = date;
-    this.midnight = new Date(date);
+  constructor(options: HebCalInit) {
+    this.debug = options.debug;
+    this.date = options.date;
+    this.midnight = new Date(options.date);
     this.midnight.setHours(0)
     this.midnight.setMinutes(0)
     this.midnight.setSeconds(0)
     this.midnight.setMilliseconds(0);
     this.timeParts = this.#getTimeParts();
-    this.locale = locale ?? this.locale
-    this.latitude = latitude;
-    this.longitude = longitude;
-    this.city = city;
-    this.tzeitAngle = tzeitAngle ?? this.tzeitAngle;
+    this.locale = options.locale ?? this.locale
+    this.latitude = options.latitude;
+    this.longitude = options.longitude;
+    this.city = options.city;
+    this.tzeitDeg = options.tzeitDeg ?? this.tzeitDeg;
+
+    this.candleLightingMins = options.candleLightingMins;
+
+    if ('havdalahMins' in options && options.havdalahMins != null)
+      this.havdalahMins = options.havdalahMins;
+    else if ('havdalahDeg' in options && options.havdalahDeg != null && !this.havdalahMins)
+      this.havdalahDeg = options.havdalahDeg;
+    else
+      this.havdalahDeg = options.tzeitDeg;
+
     this.hDate = new HDate(this.date);
     const next = new Date(this.date)
           next.setDate(this.date.getDate() + 1);
     this.nextHDate = new HDate(next);
     this.#location = this.#getLocation();
     if (!this.#location)
-      throw new Error(`Could not determine location for ${city ?? `${latitude}/${longitude}`}`);
-    this.#zmanim = this.#getZmanim();
+      throw new Error(`Could not determine location for ${options.city ?? `${options.latitude}/${options.longitude}`}`);
     this.eventsToday = this.#getTodayEvents();
     this.eventsTomorrow = this.#getTomorrowEvents();
     this.dailyZmanim = this.#getDailyZmanim();
@@ -339,25 +412,19 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
       return found
   }
 
-  #getZmanim(): Zmanim {
-    return new Zmanim(
-      this.date,
-      this.#location.getLatitude(),
-      this.#location.getLongitude(),
-    );
-  }
-
   #getEvents(start = this.hDate): HebCalEvent[] {
     const location = this.#location;
     /** Hebcals' locale isn't an iso locale, but a pronunciation hint */
     const locale = this.locale.match(/^(he|en)$/) ? this.locale : 'he';
     const end = start;
+    const { havdalahDeg, havdalahMins } = this;
     return HebrewCalendar.calendar({
       location,
       start, end,
       candlelighting: true,
       candleLightingMins: 40,
-      havdalahDeg: this.tzeitAngle,
+      havdalahDeg,
+      havdalahMins,
       il: this.locale.endsWith('IL'),
       locale,
       sedrot: true,
@@ -381,23 +448,13 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
     return this.#getEvents(this.hDate.add(1));
   }
 
-  #getDailyZmanim(): DailyZman[] {
-    const { date: now, tzeitAngle } = this;
-    const zmanim = this.#zmanim
-    let lastSeenIsPast = false
-    return HebCalDay.ZMANIM_KEYS.map(key => {
-      const date = zmanim[key](...key === 'tzeit' ? [tzeitAngle] : []);
-      const past = date < now;
-      const next = lastSeenIsPast && !past;
-      lastSeenIsPast = past && !next
-      this[key] = date;
-      return {
-        key,
-        date,
-        past,
-        next,
-      }
-    });
+  #getDailyZmanim(): DailyZmanim {
+    return new DailyZmanim(
+      this.date,
+      this.#location.getLatitude(),
+      this.#location.getLongitude(),
+      this.tzeitDeg,
+    );
   }
 
   #getParshah(): ParshaEvent {
@@ -410,15 +467,18 @@ export class HebCalDay implements Record<ZmanimKey, Date> {
 
   // TODO: rosh hashannnah meshulash
   #getCandles(): CandleLightingInfo {
-    let lighting: CandleLightingEvent;
-    let check = this.hDate;
+    let check =
+      this.isChag || this.isErevChag || this.isShabbat || this.isErevShabbat ? this.hDate.subtract(1) : this.hDate;
+    let lighting = this.#getEvents(check).find(isCandleLightingEvent);
     while (!lighting) {
-      lighting = this.#getEvents(check).find(isCandleLightingEvent);
       check = check.add(1);
+      lighting = this.#getEvents(check).find(isCandleLightingEvent);
     }
 
     const categories = lighting.getCategories();
-    const havdalah = this.#getEvents(check).find(isHavdalahEvent)
+    let havdalah = this.#getEvents(lighting.getDate()).find(isHavdalahEvent)
+    if (!havdalah)
+      havdalah = this.#getEvents(lighting.getDate().add(1)).find(isHavdalahEvent)
 
     return {
       categories,
