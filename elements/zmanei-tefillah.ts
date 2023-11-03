@@ -3,7 +3,7 @@ import { HebcalDayConsumer } from './hebcal-day.js';
 import { customElement } from 'lit/decorators.js';
 
 import style from './zmanei-tefillah.css';
-import { ZmanimKey } from './HebCal.js';
+import type { ZmanimKey } from './HebCalDay.js';
 
 @customElement('zmanei-tefillah')
 export class ZmaneiTefillah extends HebcalDayConsumer {

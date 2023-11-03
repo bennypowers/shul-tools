@@ -40,7 +40,9 @@
     },
     "pages": {
       "command": "./scripts/pages.sh",
-      "dependencies": ["build"]
+      "dependencies": [
+        "build"
+      ]
     },
     "publish": {
       "command": "npm publish -ws",
