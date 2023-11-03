@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+:is(h2, h3, h4, h5, h6) {
+  margin: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+small,
+::slotted(small) {
+  font-size: 80%;
+}
