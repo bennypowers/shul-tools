@@ -1,0 +1,7 @@
+{
+  "extends": "./index.cjs.js",
+  "rules": {
+    "no-unused-vars": "off",
+    "no-multi-spaces": "off"
+  }
+}

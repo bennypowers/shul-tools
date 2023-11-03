@@ -1,0 +1,114 @@
+:root {
+  --root-gap: 12px;
+  --hebcal-row-gap: var(--root-gap);
+  --hebcal-column-gap: calc(var(--root-gap) * 1.6);
+  --hebcal-clock-size: 200px;
+  --hebcal-clock-day-color: #ffefb6;
+  --hebcal-clock-night-color: #053752;
+}
+
+html,
+body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: Tinos, Alef, serif;
+}
+
+main, #knobs {
+  padding-inline: var(--hebcal-column-gap);
+}
+
+#knobs {
+  display: grid;
+  & button {
+    width: min-content;
+  }
+}
+
+main {
+  padding: var(--hebcal-row-gap) var(--hebcal-column-gap);
+  @media (min-width: 600px) {
+    font-size: 200%;
+  }
+}
+
+hebcal-day {
+  margin-block: var(--root-gap);
+  font-family: Alef, sans-serif;
+  display: grid;
+  row-gap: var(--hebcal-row-gap);
+  align-content: start;
+  justify-items: center;
+  grid-template:
+    'date' auto
+    'analogue' auto
+    'yom' auto
+    'tefillah' min-content
+    'candles' auto
+    'foot' auto / auto;
+  @media (min-width: 768px) {
+    grid-template:
+      'analogue date' auto
+      'yom tefillah' min-content
+      'yom candles' auto
+      'foot foot' auto
+      / auto auto;
+  }
+}
+
+hebcal-clock[type="digital"] {
+  column-gap: var(--hebcal-column-gap);
+  grid-area: clock;
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 1.2em;
+  &::part(time) {
+    font-family: inherit;
+  }
+  &::part(hour),
+  &::part(minute),
+  &::part(second) {
+    width: 1.2em;
+    align-items: center;
+    text-align: center;
+  }
+  @media (min-width: 900px) {
+    font-size: 1.5em;
+  }
+}
+
+#time-and-date {
+  grid-area: date;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+hebcal-clock[type="analogue"] {
+  grid-area: analogue;
+  width: 300px;
+  height: 300px;
+  place-self: center;
+}
+
+zmanei-yom {
+  grid-area: yom;
+}
+
+zmanei-tefillah {
+  grid-area: tefillah;
+}
+
+zmanei-shabbat {
+  grid-area: candles;
+}
+
+
+fieldset {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: var(--root-gap) calc(var(--root-gap) / 2);
+  justify-items: start;
+}
