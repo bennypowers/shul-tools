@@ -1,5 +1,5 @@
 #!/bin/bash
-mkdir -p public/node_modules/@shul/elements
+mkdir -p public/node_modules/@shul/
 cp demo/* public/
 cp -r node_modules public/
 cp -r elements public/node_modules/@shul/
