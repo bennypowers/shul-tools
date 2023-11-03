@@ -12,6 +12,7 @@
     "start": "wireit",
     "publish": "wireit",
     "version:patch": "wireit",
+    "pages": "wireit",
     "build": "wireit"
   },
   "keywords": [
@@ -36,6 +37,10 @@
     },
     "build": {
       "command": "tspc"
+    },
+    "pages": {
+      "command": "./scripts/pages.sh",
+      "dependencies": ["build"]
     },
     "publish": {
       "command": "npm publish -ws",
