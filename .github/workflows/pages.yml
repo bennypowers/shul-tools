@@ -13,6 +13,12 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: npm
+
       - run: |
           mkdir -p public/node_modules
           cp demo/* public/
@@ -20,6 +26,7 @@ jobs:
           cp -r elements public/node_modules/
           sed -i 's/\.\.\/elements/\.\/node_modules/elements/' public/index.html
           sed -i 's/\.\.\/node_modules/\.\/node_modules/' public/index.html
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
