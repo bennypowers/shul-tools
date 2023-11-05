@@ -1,6 +1,8 @@
 node_modules
 .wireit
 
+public
+
 elements/**/*.js
 elements/**/*.d.ts
 elements/**/*.js.map
