@@ -1,9 +1,10 @@
+import type { ZmanimKey } from './DailyZmanim.js';
+
 import { html } from 'lit';
 import { HebcalDayConsumer } from './hebcal-day.js';
 import { customElement } from 'lit/decorators.js';
 
 import style from './zmanei-tefillah.css';
-import type { ZmanimKey } from './HebCalDay.js';
 
 @customElement('zmanei-tefillah')
 export class ZmaneiTefillah extends HebcalDayConsumer {

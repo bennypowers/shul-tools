@@ -29,9 +29,9 @@
     "web components"
   ],
   "dependencies": {
-    "@hebcal/core": "^4.4.1",
-    "@lit/context": "^1.0.0",
-    "lit": "^3.0.0",
+    "@hebcal/core": "^4.5.1",
+    "@lit/context": "^1.0.1",
+    "lit": "^3.0.2",
     "tslib": "^2.6.2"
   }
 }
