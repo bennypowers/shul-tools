@@ -7,11 +7,15 @@ function isReactiveElement(host: ReactiveControllerHost): host is ReactiveElemen
 export class ClockController<T extends ReactiveControllerHost> implements ReactiveController {
   #host: ReactiveControllerHost;
 
-  #interval?: number;
-
   #date: Date;
 
   #key: keyof T;
+
+  #ticking = false;
+
+  #lastSecond = -1;
+
+  #reactiveElementHost?: ReactiveElement;
 
   get date(): Date {
     return this.#date;
@@ -22,15 +26,25 @@ export class ClockController<T extends ReactiveControllerHost> implements Reacti
     key?: keyof T,
   ) {
     this.#host = host;
+    if (isReactiveElement(this.#host))
+      this.#reactiveElementHost = this.#host
     this.#key = key,
     host.addController(this)
     this.start();
   }
 
   #tick = () => {
+    const last = this.#lastSecond
+    if (last !== (this.#lastSecond = new Date().getSeconds()))
+      this.#update();
+    if (this.#ticking)
+      requestAnimationFrame(this.#tick)
+  }
+
+  #update() {
     this.#date = new Date();
-    if (isReactiveElement(this.#host))
-      this.#host.requestUpdate(this.#key, null);
+    if (this.#reactiveElementHost)
+      this.#reactiveElementHost.requestUpdate(this.#key, null);
     else
       this.#host.requestUpdate();
   }
@@ -45,14 +59,12 @@ export class ClockController<T extends ReactiveControllerHost> implements Reacti
   }
 
   start() {
-    this.#interval = window.setInterval(this.#tick, 1000);
+    this.#ticking = true;
     this.#tick();
   }
 
   stop() {
-    if (this.#interval)
-      window.clearInterval(this.#interval)
-    this.#interval = undefined;
+    this.#ticking = false;
   }
 
   hostConnected(): void {

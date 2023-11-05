@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import { consume, createContext, provide } from '@lit/context';
 
-import { observes } from './lib/decorators.js';
+import { observes, clock } from './lib/decorators.js';
 
 import { HebCalDay } from './HebCalDay.js';
 
@@ -12,7 +12,6 @@ import sharedStyles from './shared.css'
 import styles from './hebcal-day.css';
 
 import childStyles from './hebcal-consumer.css';
-import { ClockController } from './lib/ClockController.js';
 import { DateConverter } from './lib/DateConverter.js';
 
 const context = createContext<HebCalDay>('hebcal');
@@ -83,8 +82,7 @@ export class HebcalDay extends LitElement {
     attribute: 'specific-date',
   }) accessor specificDate: Date | undefined;
 
-  /** @internal */
-  #clock = new ClockController(this, '#clock' as keyof HebcalDay);
+  @clock accessor date: Date;
 
   @property({ reflect: true, type: Boolean })
   accessor debug = false;
@@ -96,8 +94,6 @@ export class HebcalDay extends LitElement {
   @provide({ context })
   accessor hayom = this.#getHebcalDay();
 
-  get date() { return this.#clock.date; }
-  set date(date: Date) { this.#clock.set(date); }
 
   override render() {
     return html`
@@ -105,19 +101,17 @@ export class HebcalDay extends LitElement {
     `;
   }
 
-  @observes('specificDate') #debugDateChanged(old: { specificDate?: Date }) {
+  @observes('specificDate') #specificDateChanged(old: { specificDate?: Date }) {
     if (old.specificDate && !this.specificDate) {
-      this.#clock.reset();
-      this.#clock.start();
+      clock.reset(this);
+      clock.start(this);
     } else {
-      this.#clock.stop();
-      this.#clock.set(this.specificDate);
-      this.requestUpdate('#clock' as keyof HebcalDay, old.specificDate);
+      clock.stop(this);
+      clock.set(this, this.specificDate);
     }
   }
 
   @observes(
-    '#clock' as keyof HebcalDay,
     'candleLightingMinutesBeforeSunset',
     'date',
     'debug',
