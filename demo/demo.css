@@ -15,17 +15,6 @@ body {
   font-family: Tinos, Alef, serif;
 }
 
-main, #knobs {
-  padding-inline: var(--hebcal-column-gap);
-}
-
-#knobs {
-  display: grid;
-  & button {
-    width: min-content;
-  }
-}
-
 main {
   padding: var(--hebcal-row-gap) var(--hebcal-column-gap);
   @media (min-width: 600px) {
@@ -103,12 +92,4 @@ zmanei-tefillah {
 
 zmanei-shabbat {
   grid-area: candles;
-}
-
-
-fieldset {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: var(--root-gap) calc(var(--root-gap) / 2);
-  justify-items: start;
 }
