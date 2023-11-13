@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>שול טולס</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@shul/elements": "../../elements/elements.js",
+          "tslib": "../../node_modules/tslib/tslib.es6.js",
+          "lit": "../../node_modules/lit/index.js",
+          "lit-html": "../../node_modules/lit-html/lit-html.js",
+          "lit-html/": "../../node_modules/lit-html/",
+          "lit-element/": "../../node_modules/lit-element/",
+          "lit/": "../../node_modules/lit/",
+          "@lit/": "../../node_modules/@lit/",
+          "@lit/reactive-element": "../../node_modules/@lit/reactive-element/reactive-element.js",
+          "@lit/context": "../../node_modules/@lit/context/index.js",
+          "@hebcal/core": "../../node_modules/@hebcal/core/dist/index.mjs"
+        }
+      }
+    </script>
+    <script type="module" src="yerushalayim.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      table {
+        & th,
+        & td {
+          padding: .3em 1em;
+          vertical-align: top;
+        }
+        & tbody {
+          & th {
+            text-align: right;
+          }
+          & dl {
+            margin: 0;
+            display: grid;
+            column-gap: 1em;
+            grid-template-columns: auto auto;
+          }
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h2>Shkiya Times</h2>
+      <table id="shkiah"></table>
+      <h2>Netz Times</h2>
+      <table id="neitz"></table>
+    </main>
+  </body>
+</html>
