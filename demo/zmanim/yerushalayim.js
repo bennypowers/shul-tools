@@ -6,14 +6,6 @@ const H1 = 'Hannukah 1';
 const P1 = 'Pesach';
 const TA = 'Tisha B\'Av';
 
-/** @type {Map<string, Date>} */
-const DATES = new Map([
-  [RH, '2022-09-26'],
-  [H1, '2022-12-19'],
-  [P1, '2023-04-06'],
-  [TA, '2023-06-26'],
-].map(([d, iso]) => [d, new Date(iso)]));
-
 const LOCATIONS = {
   North: [31.87878, 35.21721],
   East: [31.76446, 35.28068],
@@ -21,6 +13,13 @@ const LOCATIONS = {
   West: [31.75163, 35.13640],
   Mikdash: [31.77802, 35.23539],
 };
+
+const DATES = new Map([
+  [RH, '2022-09-26'],
+  [H1, '2022-12-19'],
+  [P1, '2023-04-06'],
+  [TA, '2023-06-26'],
+].map(([d, iso]) => [d, new Date(iso)]));
 
 const SHKIAH_L_DUM = new Map([
   [RH, '6:35:00 PM'],
