@@ -1,4 +1,5 @@
 import { DailyZmanim, ZmanimI18nKeys } from './DailyZmanim.js';
+import { GeoLocation } from '@hebcal/noaa';
 
 import {
   type Event as HebCalEvent,
@@ -137,6 +138,8 @@ export class HebCalDay {
 
   longitude: number;
 
+  elevation: number;
+
   tzeitDeg = THREE_SMALL_STARS;
 
   candleLightingMins: number;
@@ -189,7 +192,9 @@ export class HebCalDay {
     return this.eventsToday.length && this.eventsToday.every(x => x.mask & flags.CHOL_HAMOED);
   }
 
-  #location: HebCalLocation
+  #location: HebCalLocation;
+
+  #geoLocation: GeoLocation;
 
   constructor(options: HebCalInit) {
     this.debug = options.debug;
@@ -220,6 +225,7 @@ export class HebCalDay {
           next.setDate(this.date.getDate() + 1);
     this.nextHDate = new HDate(next);
     this.#location = this.#getLocation();
+    this.#geoLocation = this.#getGeoLocation();
     if (!this.#location)
       throw new Error(`Could not determine location for ${options.city ?? `${options.latitude}/${options.longitude}`}`);
     this.eventsToday = this.#getTodayEvents();
@@ -245,6 +251,16 @@ export class HebCalDay {
     return { hour, minute, second, timeZoneName, dayPeriod };
   }
 
+  #getGeoLocation() {
+    return new GeoLocation(
+      this.city ?? null,
+      this.#location.getLatitude(),
+      this.#location.getLongitude(),
+      this.#location.getElevation(),
+      this.#location.getTzid(),
+    );
+  }
+
   #getLocation() {
     const found = HebCalLocation.lookup(this.city);
     if (this.latitude && this.longitude)
@@ -256,6 +272,7 @@ export class HebCalDay {
         found?.getName(),
         found?.getCountryCode(),
         found?.getGeoId(),
+        this.elevation ?? found?.getElevation(),
       );
     else
       return found
@@ -300,8 +317,7 @@ export class HebCalDay {
   #getDailyZmanim(): DailyZmanim {
     return new DailyZmanim(
       this.date,
-      this.#location.getLatitude(),
-      this.#location.getLongitude(),
+      this.#geoLocation,
       this.tzeitDeg,
     );
   }

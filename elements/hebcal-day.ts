@@ -34,6 +34,13 @@ export class HebcalDay extends LitElement {
   @property()
   accessor city = 'Jerusalem';
 
+  /**
+   * City whence to lookup zmanim
+   * @see https://github.com/hebcal/hebcal-es6/tree/main#locationlookupname--location
+   */
+  @property({ type: Number })
+  accessor elevation: number | undefined = 784
+
   /** setting latitude and longitude overrides `city` */
   @property({ type: Number })
   accessor latitude: number | undefined;

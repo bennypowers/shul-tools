@@ -29,7 +29,8 @@
     "web components"
   ],
   "dependencies": {
-    "@hebcal/core": "^4.5.1",
+    "@hebcal/core": "^5.0.0-rc.3",
+    "@hebcal/noaa": "^0.8.6",
     "@lit/context": "^1.0.1",
     "lit": "^3.0.2",
     "tslib": "^2.6.2"
