@@ -30,6 +30,7 @@ interface HebCalInitBase {
   locale: string;
   latitude: number;
   longitude: number;
+  elevation: number;
   tzeitDeg: number;
   candleLightingMins: number,
 }
@@ -208,6 +209,7 @@ export class HebCalDay {
     this.locale = options.locale ?? this.locale
     this.latitude = options.latitude;
     this.longitude = options.longitude;
+    this.elevation = options.elevation;
     this.city = options.city;
     this.tzeitDeg = options.tzeitDeg ?? this.tzeitDeg;
 
@@ -283,12 +285,12 @@ export class HebCalDay {
     /** Hebcals' locale isn't an iso locale, but a pronunciation hint */
     const locale = this.locale.match(/^(he|en)$/) ? this.locale : 'he';
     const end = start;
-    const { havdalahDeg, havdalahMins } = this;
+    const { havdalahDeg, havdalahMins, candleLightingMins } = this;
     return HebrewCalendar.calendar({
       location,
       start, end,
       candlelighting: true,
-      candleLightingMins: 40,
+      candleLightingMins,
       havdalahDeg,
       havdalahMins,
       il: this.locale.endsWith('IL'),
@@ -344,6 +346,10 @@ export class HebCalDay {
     let havdalah = this.#getEvents(lighting.getDate()).find(isHavdalahEvent)
     if (!havdalah)
       havdalah = this.#getEvents(lighting.getDate().add(1)).find(isHavdalahEvent)
+
+    console.log(
+      this.candleLightingMins, lighting.eventTimeStr,
+    )
 
     return {
       categories,

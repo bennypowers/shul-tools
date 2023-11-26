@@ -26,7 +26,7 @@ hebcal-day {
   margin-block: var(--root-gap);
   font-family: Alef, sans-serif;
   display: grid;
-  row-gap: var(--hebcal-row-gap);
+  row-gap: var(--hebcal-row-gap) var(--hebcal-column-gap);
   align-content: start;
   justify-items: center;
   grid-template:
@@ -38,10 +38,10 @@ hebcal-day {
     'foot' auto / auto;
   @media (min-width: 768px) {
     grid-template:
-      'analogue date' auto
-      'yom tefillah' min-content
-      'yom candles' auto
-      'foot foot' auto
+      'analogue date'
+      'yom tefillah'
+      'yom candles'
+      'yom foot'
       / auto auto;
   }
 }

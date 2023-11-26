@@ -1,7 +1,7 @@
+import type { GeoLocation } from '@hebcal/noaa';
+
 import { Zmanim } from '@hebcal/core';
 import { THREE_MEDIUM_STARS } from './constants.js';
-import type { GeoLocation } from '@hebcal/noaa';
-import { isValid } from './lib/date.js';
 
 export type ZmanimKey = typeof DailyZmanim.ZMANIM_KEYS[number];
 
@@ -62,15 +62,12 @@ export class DailyZmanim {
     tzeitDeg = THREE_MEDIUM_STARS,
   ) {
     const zmanim = new Zmanim(geoLocation, now);
-    console.log(geoLocation)
     let lastSeenIsPast = false
     for (const key of DailyZmanim.ZMANIM_KEYS) {
       const date = zmanim[key](...key === 'tzeit' ? [tzeitDeg] : []);
       const past = date < now;
       const next = lastSeenIsPast && !past;
       lastSeenIsPast = past && !next
-      if (!isValid(date))
-        console.log({ key, date, past, next });
       this.#keys.set(key, { date, past, next });
     }
   }

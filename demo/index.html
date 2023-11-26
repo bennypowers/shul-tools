@@ -17,7 +17,9 @@
         "@lit/": "../../node_modules/@lit/",
         "@lit/reactive-element": "../../node_modules/@lit/reactive-element/reactive-element.js",
         "@lit/context": "../../node_modules/@lit/context/index.js",
-        "@hebcal/core": "../../node_modules/@hebcal/core/dist/index.mjs"
+        "@hebcal/core": "../../node_modules/@hebcal/core/dist/index.mjs",
+        "temporal-polyfill": "../../node_modules/temporal-polyfill/dist/index.mjs",
+        "@hebcal/noaa": "../../node_modules/@hebcal/noaa/dist/esm/index.js"
       }
     }
     </script>
@@ -33,8 +35,9 @@
     </header>
     <main>
       <hebcal-day id="day"
-                  city="Jerusalem"
-                  havdalah-degrees="8.5"
+                  latitude="31.802943"
+                  longitude="35.240726"
+                  elevation="784"
                   candle-lighting-minutes-before-sunset="40">
 
         <hebcal-clock id="analogue" type="analogue"></hebcal-clock>
@@ -118,15 +121,6 @@
         <zmanei-shabbat id="shabbat"></zmanei-shabbat>
 
         <daf-yomi id="daf-yomi"></daf-yomi>
-
-        <small id="disclaimer">
-          הזמנים חושבו לפי מיקום המדויק של בית הכנסת
-          ובגובה פני הים.
-          במקרא של אי הסכמה בין
-          הזמנים שמופיעים פה לבין
-          הזמנים המודפסים בלוח,
-          <strong>יש לסמוך על הזמנים המודפסים</strong>
-        </small>
       </hebcal-day>
 
     </main>

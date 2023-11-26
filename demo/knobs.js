@@ -106,6 +106,26 @@ export class HebcalKnobs extends HTMLElement {
             <option>Washington DC</option>
             <option>Worcester</option>
           </select>
+
+          <label for="latitude">Latitude</label>
+          <input id="latitude"
+                 data-target="hebcal-day"
+                 name="latitude"
+                 value="31.802943"
+                 type="number">
+          <label for="longitude">Longitude</label>
+          <input id="longitude"
+                 data-target="hebcal-day"
+                 name="longitude"
+                 value="35.240726"
+                 type="number">
+          <label for="elevation">Elevation</label>
+          <input id="elevation"
+                 name="elevation"
+                 data-target="hebcal-day"
+                 value="784"
+                 type="number">
+
           <label for="knob-tzeit-degrees">Tzeit angle (°)</label>
           <input id="knob-tzeit-degrees"
                  name="tzeitDegrees"
@@ -113,12 +133,24 @@ export class HebcalKnobs extends HTMLElement {
                  data-target="hebcal-day"
                  value="8.0">
 
-          <label for="knob-candle-lighting-minutes-before-sunset">Candle lighting minutes before sunset</label>
-          <input id="knob-candle-lighting-minutes-before-sunset"
-                 name="candleLightingMinutesBeforeSunset"
-                 data-target="hebcal-day"
-                 type="number"
-                 value="40">
+          <span>Candle lighting minutes before sunset</span>
+          <div>
+            <input id="min18"
+                   name="candleLightingMinutesBeforeSunset"
+                   data-target="hebcal-day"
+                   data-type="number"
+                   type="radio"
+                   value="18">
+            <label for="min18">18 minutes</label>
+            <input id="min40"
+                   name="candleLightingMinutesBeforeSunset"
+                   data-target="hebcal-day"
+                   data-type="number"
+                   type="radio"
+                   checked
+                   value="40">
+            <label for="min40">40 minutes</label>
+          </div>
 
           <label for="knob-havdalah-degrees">Havdala offset in degrees</label>
           <input id="knob-havdalah-degrees"
@@ -133,7 +165,6 @@ export class HebcalKnobs extends HTMLElement {
                  data-target="hebcal-day"
                  type="number"
                  value="0">
-
         </fieldset>
 
         <fieldset>
@@ -271,9 +302,11 @@ export class HebcalKnobs extends HTMLElement {
       if (element instanceof HTMLInputElement) {
         const target = this.$light(element.dataset.target);
         if (target) {
+          if (element.type.match(/radio|checkbox/) && !element.checked)
+            continue;
           target[element.name] =
-              element.type === 'number' ? parseFloat(element.value)
-            : element.type === 'checkbox' ? element.checked
+              element.type === 'checkbox' ? element.checked
+            : element.type === 'number' || element.dataset.type === 'number' ? parseFloat(element.value)
             : element.value
         } else if (element.dataset?.target) {
           console.warn(`Could not find target ${element.dataset.target}`);
