@@ -240,7 +240,6 @@ export class HebCalDay {
     this.parsha = this.#getParshah();
     this.candles = this.#getCandles();
     this.daf = DailyLearning.lookup('dafYomi', this.hDate);
-    console.log(this.daf, this.eventsToday);
   }
 
   #getTimeParts() {
