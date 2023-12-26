@@ -1,4 +1,4 @@
-import type { ZmanimKey } from './DailyZmanim.js';
+import type { ZmanimKey } from './lib/DailyZmanim.js';
 
 import { html } from 'lit';
 import { HebcalDayConsumer } from './hebcal-day.js';

@@ -5,7 +5,7 @@ import { consume, createContext, provide } from '@lit/context';
 
 import { observes, clock } from './lib/decorators.js';
 
-import { HebCalDay } from './HebCalDay.js';
+import { HebCalDay } from './lib/HebCalDay.js';
 
 import sharedStyles from './shared.css'
 
@@ -108,7 +108,8 @@ export class HebcalDay extends LitElement {
     `;
   }
 
-  @observes('specificDate') #specificDateChanged(old: { specificDate?: Date }) {
+  @observes('specificDate')
+  #specificDateChanged(old: { specificDate?: Date }) {
     if (old.specificDate && !this.specificDate) {
       clock.reset(this);
       clock.start(this);

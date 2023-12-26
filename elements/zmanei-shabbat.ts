@@ -36,9 +36,6 @@ export class ZmaneiShabbat extends HebcalDayConsumer {
     if (isChag || isErevChag)
       desc += i18n.chag;
 
-    if (!havdalah)
-      console.log(this.hayom.hDate)
-
     return html`
       <slot>
         <h2>

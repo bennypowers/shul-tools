@@ -7,3 +7,5 @@ export * from './zmanei-yom.js';
 export * from './zmanei-shabbat.js';
 export * from './zmanei-tefillah.js';
 
+export * from './daf-yomi.js';
+

@@ -1,5 +1,7 @@
 import { DailyZmanim, ZmanimI18nKeys } from './DailyZmanim.js';
 import { GeoLocation } from '@hebcal/noaa';
+import { DailyLearning } from '@hebcal/core';
+import '@hebcal/learning';
 
 import {
   type Event as HebCalEvent,
@@ -167,6 +169,8 @@ export class HebCalDay {
 
   readonly midnight: Date;
 
+  readonly daf: HebCalEvent;
+
   get i18n() { return HebCalDay.i18n[this.locale]; }
 
   get isShabbat() { return this.hDate.getDay() === 6; }
@@ -235,6 +239,8 @@ export class HebCalDay {
     this.dailyZmanim = this.#getDailyZmanim();
     this.parsha = this.#getParshah();
     this.candles = this.#getCandles();
+    this.daf = DailyLearning.lookup('dafYomi', this.hDate);
+    console.log(this.daf, this.eventsToday);
   }
 
   #getTimeParts() {
@@ -286,8 +292,9 @@ export class HebCalDay {
     const locale = this.locale.match(/^(he|en)$/) ? this.locale : 'he';
     const end = start;
     const { havdalahDeg, havdalahMins, candleLightingMins } = this;
-    return HebrewCalendar.calendar({
+    const events = HebrewCalendar.calendar({
       location,
+      useElevation: this.elevation != null,
       start, end,
       candlelighting: true,
       candleLightingMins,
@@ -306,6 +313,7 @@ export class HebCalDay {
         mishnaYomi: true,
       }
     });
+    return events
   }
 
   #getTodayEvents(): HebCalEvent[] {
@@ -335,7 +343,8 @@ export class HebCalDay {
   // TODO: rosh hashannnah meshulash
   #getCandles(): CandleLightingInfo {
     let check =
-      this.isChag || this.isErevChag || this.isShabbat || this.isErevShabbat ? this.hDate.subtract(1) : this.hDate;
+      this.isChag || this.isErevChag || this.isShabbat || this.isErevShabbat ? this.hDate.subtract(1)
+    : this.hDate;
     let lighting = this.#getEvents(check).find(isCandleLightingEvent);
     while (!lighting) {
       check = check.add(1);
@@ -346,10 +355,6 @@ export class HebCalDay {
     let havdalah = this.#getEvents(lighting.getDate()).find(isHavdalahEvent)
     if (!havdalah)
       havdalah = this.#getEvents(lighting.getDate().add(1)).find(isHavdalahEvent)
-
-    console.log(
-      this.candleLightingMins, lighting.eventTimeStr,
-    )
 
     return {
       categories,

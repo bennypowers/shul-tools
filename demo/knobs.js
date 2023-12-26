@@ -111,19 +111,19 @@ export class HebcalKnobs extends HTMLElement {
           <input id="latitude"
                  data-target="hebcal-day"
                  name="latitude"
-                 value="31.802943"
+                 value="31.77801"
                  type="number">
           <label for="longitude">Longitude</label>
           <input id="longitude"
                  data-target="hebcal-day"
                  name="longitude"
-                 value="35.240726"
+                 value="35.23531"
                  type="number">
           <label for="elevation">Elevation</label>
           <input id="elevation"
                  name="elevation"
                  data-target="hebcal-day"
-                 value="784"
+                 value="746"
                  type="number">
 
           <label for="knob-tzeit-degrees">Tzeit angle (°)</label>

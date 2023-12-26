@@ -1,5 +1,5 @@
 :root {
-  --root-gap: 12px;
+  --root-gap: 6px;
   --hebcal-row-gap: var(--root-gap);
   --hebcal-column-gap: calc(var(--root-gap) * 1.6);
   --hebcal-clock-size: 200px;
@@ -52,9 +52,7 @@ hebcal-clock[type="digital"] {
   font-family: 'Chakra Petch', sans-serif;
   font-weight: 700;
   font-size: 1.2em;
-  &::part(time) {
-    font-family: inherit;
-  }
+  &::part(time) { font-family: inherit; }
   &::part(hour),
   &::part(minute),
   &::part(second) {
@@ -92,4 +90,7 @@ zmanei-tefillah {
 
 zmanei-shabbat {
   grid-area: candles;
+  &::part(events) {
+    grid-template-columns: repeat(4, max-content);
+  }
 }
