@@ -11,6 +11,7 @@ for p in "tslib" \
          "lit-element" \
          "lit" \
          "@lit" \
+         "temporal-polyfill" \
          "@hebcal"; do
   cp -r node_modules/$p public/node_modules/;
 done
