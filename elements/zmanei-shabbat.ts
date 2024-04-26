@@ -43,21 +43,21 @@ export class ZmaneiShabbat extends HebcalDayConsumer {
           <span part="parshah">📖 ${parsha?.render(locale) ?? ''}</span>
         </h2>
       </slot>
-      <dl id="events" part="events">
-        <dt class="term" part="list term lighting">
+      <dl id="events" part="list">
+        <dt class="term" part="term lighting">
           <span>${lighting.renderBrief(locale)}</span>
           <span class="emoji" part="emoji">${lighting.getEmoji()}</span>
         </dt>
-        <dd part="list definition lighting">
+        <dd part="definition lighting">
           <time datetime="${lighting.eventTime?.toISOString()}">
             ${lighting.eventTimeStr}
           </time>${this.#dump(lighting.eventTime)}
         </dd>
-        <dt class="term" part="list term havdalah">
+        <dt class="term" part="term havdalah">
           <span>${havdalah.renderBrief(locale)}</span>
           <span class="emoji" part="emoji">${havdalah.getEmoji()}</span>
         </dt>
-        <dd part="list definition havdalah">
+        <dd part="definition havdalah">
           <time datetime="${havdalah.eventTime.toISOString()}">
             ${havdalah.eventTimeStr}
           </time>${this.#dump(havdalah.eventTime)}

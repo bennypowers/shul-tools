@@ -8,16 +8,14 @@ export class ZmaneiYom extends HebcalDayConsumer {
   render() {
     const { dailyZmanim, i18n, locale, tzeitDeg } = this.hayom ?? {};
     return html`
-      <heading>
-        <h2>${i18n?.zmanei ?? ''} ${i18n?.yom ?? ''}</h2>
-      </heading>
-      <dl>${dailyZmanim?.map(({ key, date, past, next }) => html`
+      <h2>${i18n?.zmanei ?? ''} ${i18n?.yom ?? ''}</h2>
+      <dl part="list">${dailyZmanim?.map(({ key, date, past, next }) => html`
         <div class="${classMap({ past, next })}">
-          <dt part="list term">
+          <dt part="term">
             <span>${i18n[key]}</span>${key !== 'tzeit' ? '' : html`
-            <small>(${tzeitDeg}°)</small>`}
+            <small part="tzeit-angle">(${tzeitDeg}°)</small>`}
           </dt>
-          <dd part="list definition">
+          <dd part="definition">
             <time datetime="${date.toISOString()}">
               ${date.toLocaleTimeString(locale, { timeStyle: 'medium' })}
             </time>
