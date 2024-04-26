@@ -61,12 +61,7 @@ export class DailyZmanim {
     geoLocation: GeoLocation,
     tzeitDeg = THREE_MEDIUM_STARS,
   ) {
-    const zmanim = new Zmanim(
-      geoLocation,
-      now,
-      // @ts-expect-error: hebcal .d.ts is out of date
-      true,
-    );
+    const zmanim = new Zmanim(geoLocation, now, true);
     let lastSeenIsPast = false
     for (const key of DailyZmanim.ZMANIM_KEYS) {
       const date = zmanim[key](...key === 'tzeit' ? [tzeitDeg] : []);

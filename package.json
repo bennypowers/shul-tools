@@ -55,18 +55,18 @@
     "elements"
   ],
   "devDependencies": {
-    "@parse5/tools": "^0.3.0",
+    "@parse5/tools": "^0.4.0",
     "@pwrs/eslint-config": "^0.0.26",
-    "@web/dev-server": "^0.4.1",
-    "@web/dev-server-esbuild": "^1.0.1",
+    "@web/dev-server": "^0.4.4",
+    "@web/dev-server-esbuild": "^1.0.2",
     "@web/dev-server-import-maps": "^0.2.0",
-    "esbuild": "^0.19.10",
+    "esbuild": "^0.20.2",
     "eslint": "^8.56.0",
     "parse5": "^7.1.2",
-    "ts-patch": "^3.1.1",
+    "ts-patch": "^3.1.2",
     "tslib": "^2.6.2",
-    "typescript": "^5.3.3",
-    "typescript-transform-lit-css": "^1.1.1",
-    "wireit": "^0.14.1"
+    "typescript": "^5.4.5",
+    "typescript-transform-lit-css": "^2.0.0",
+    "wireit": "^0.14.4"
   }
 }

@@ -1,7 +1,7 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type PropertyValueMap, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { consume, createContext, provide } from '@lit/context';
+import { ContextRoot, createContext, consume, provide } from '@lit/context';
 
 import { observes, clock } from './lib/decorators.js';
 
@@ -15,6 +15,9 @@ import childStyles from './hebcal-consumer.css';
 import { DateConverter } from './lib/DateConverter.js';
 
 const context = createContext<HebCalDay>('hebcal');
+
+const root = new ContextRoot();
+root.attach(document.documentElement);
 
 @customElement('hebcal-day')
 export class HebcalDay extends LitElement {
@@ -165,6 +168,10 @@ export class HebcalDayConsumer extends LitElement {
    */
   @consume({ context, subscribe: true })
   accessor hayom: HebCalDay;
+
+  override shouldUpdate(changed: PropertyValues<this>): boolean {
+    return !!this.hayom;
+  }
 }
 
 declare global {

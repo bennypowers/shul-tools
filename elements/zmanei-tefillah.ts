@@ -48,7 +48,9 @@ export class ZmaneiTefillah extends HebcalDayConsumer {
     `;
   }
 
-  #update() {
+  async #update() {
+    while (!this.hayom)
+      await this.updateComplete;
     for (const time of this.querySelectorAll('time')) {
       if (!time.dateTime) {
         const { offset, offsetFrom } = time.dataset;
