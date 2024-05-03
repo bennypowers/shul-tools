@@ -1,19 +1,22 @@
 import { DailyZmanim, ZmanimI18nKeys } from './DailyZmanim.js';
 import { GeoLocation } from '@hebcal/noaa';
-import { DailyLearning } from '@hebcal/core';
-import '@hebcal/learning';
 
 import {
-  type Event as HebCalEvent,
   flags,
+  type Event as HebCalEvent,
+  DailyLearning,
   HDate,
   HebrewCalendar,
   Location as HebCalLocation,
+  HavdalahEvent,
   ParshaEvent,
   CandleLightingEvent,
-  HavdalahEvent,
+  OmerEvent,
 } from '@hebcal/core';
+
 import { THREE_SMALL_STARS } from './constants.js';
+
+import '@hebcal/learning';
 
 export interface I18nKeys extends ZmanimI18nKeys {
   shabbat: string;
@@ -47,6 +50,10 @@ export interface CandleLightingInfo {
   categories: string[];
   lighting: CandleLightingEvent;
   havdalah: HavdalahEvent
+}
+
+function isOmerEvent(x: HebCalEvent): x is OmerEvent {
+  return x instanceof OmerEvent;
 }
 
 function isParshaEvent(x: HebCalEvent): x is ParshaEvent {
@@ -197,6 +204,14 @@ export class HebCalDay {
     return this.eventsToday.length && this.eventsToday.every(x => x.mask & flags.CHOL_HAMOED);
   }
 
+  get isOmer() {
+    return this.eventsToday.some(isOmerEvent);
+  }
+
+  get omer(): OmerEvent {
+    return this.eventsToday.find(isOmerEvent);
+  }
+
   #location: HebCalLocation;
 
   #geoLocation: GeoLocation;
@@ -345,16 +360,13 @@ export class HebCalDay {
       this.isChag || this.isErevChag || this.isShabbat || this.isErevShabbat ? this.hDate.subtract(1)
     : this.hDate;
     let lighting = this.#getEvents(check).find(isCandleLightingEvent);
-    while (!lighting) {
+    let havdalah = this.#getEvents(check).find(isHavdalahEvent);
+    while (!lighting || !havdalah) {
       check = check.add(1);
-      lighting = this.#getEvents(check).find(isCandleLightingEvent);
+      lighting ??= this.#getEvents(check).find(isCandleLightingEvent);
+      havdalah ??= this.#getEvents(check).find(isHavdalahEvent);
     }
-
     const categories = lighting.getCategories();
-    let havdalah = this.#getEvents(lighting.getDate()).find(isHavdalahEvent)
-    if (!havdalah)
-      havdalah = this.#getEvents(lighting.getDate().add(1)).find(isHavdalahEvent)
-
     return {
       categories,
       lighting,

@@ -55,6 +55,7 @@
     "elements"
   ],
   "devDependencies": {
+    "@hebcal/core": "^5.3.5",
     "@parse5/tools": "^0.4.0",
     "@pwrs/eslint-config": "^0.0.26",
     "@web/dev-server": "^0.4.4",
@@ -63,6 +64,7 @@
     "esbuild": "^0.20.2",
     "eslint": "^8.56.0",
     "parse5": "^7.1.2",
+    "temporal-polyfill": "^0.2.4",
     "ts-patch": "^3.1.2",
     "tslib": "^2.6.2",
     "typescript": "^5.4.5",
