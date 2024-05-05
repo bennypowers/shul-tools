@@ -168,6 +168,8 @@ export class HebCalDay {
 
   readonly dailyZmanim: DailyZmanim;
 
+  readonly events: HebCalEvent[];
+
   readonly eventsToday: HebCalEvent[];
 
   readonly eventsTomorrow: HebCalEvent[];
@@ -205,11 +207,11 @@ export class HebCalDay {
   }
 
   get isOmer() {
-    return this.eventsToday.some(isOmerEvent);
+    return this.events.some(isOmerEvent);
   }
 
   get omer(): OmerEvent {
-    return this.eventsToday.find(isOmerEvent);
+    return this.events.find((x): x is OmerEvent => isOmerEvent(x) && x.getDate().isSameDate(this.hDate));
   }
 
   #location: HebCalLocation;
@@ -218,8 +220,8 @@ export class HebCalDay {
 
   constructor(options: HebCalInit) {
     this.debug = options.debug;
-    this.date = options.date;
-    this.midnight = new Date(options.date);
+    this.date = options.date ?? new Date();
+    this.midnight = new Date(this.date);
     this.midnight.setHours(0)
     this.midnight.setMinutes(0)
     this.midnight.setSeconds(0)
@@ -241,17 +243,23 @@ export class HebCalDay {
     else
       this.havdalahDeg = options.tzeitDeg;
 
-    this.hDate = new HDate(this.date);
-    const next = new Date(this.date)
-          next.setDate(this.date.getDate() + 1);
-    this.nextHDate = new HDate(next);
     this.#location = this.#getLocation();
     this.#geoLocation = this.#getGeoLocation();
     if (!this.#location)
       throw new Error(`Could not determine location for ${options.city ?? `${options.latitude}/${options.longitude}`}`);
-    this.eventsToday = this.#getTodayEvents();
-    this.eventsTomorrow = this.#getTomorrowEvents();
-    this.dailyZmanim = this.#getDailyZmanim();
+
+    this.hDate = new HDate(options.date);
+
+    this.dailyZmanim = new DailyZmanim(this.hDate, this.date, this.#geoLocation, this.tzeitDeg);
+
+    if (this.dailyZmanim.isPast('tzeit'))
+      this.hDate = this.hDate.add(1);
+
+    this.nextHDate = this.hDate.add(1);
+
+    this.events = this.#getEvents();
+    this.eventsToday = this.events.filter(x => x.getDate().isSameDate(this.hDate));
+    this.eventsTomorrow = this.events.filter(x => x.getDate().isSameDate(this.hDate.add(1)));
     this.parsha = this.#getParshah();
     this.candles = this.#getCandles();
     this.daf = DailyLearning.lookup('dafYomi', this.hDate);
@@ -304,7 +312,7 @@ export class HebCalDay {
     const location = this.#location;
     /** Hebcals' locale isn't an iso locale, but a pronunciation hint */
     const locale = this.locale.match(/^(he|en)$/) ? this.locale : 'he';
-    const end = start;
+    const end = start.add(7);
     const { havdalahDeg, havdalahMins, candleLightingMins } = this;
     const events = HebrewCalendar.calendar({
       location,
@@ -330,28 +338,8 @@ export class HebCalDay {
     return events
   }
 
-  #getTodayEvents(): HebCalEvent[] {
-    return this.#getEvents();
-  }
-
-  #getTomorrowEvents(): HebCalEvent[] {
-    return this.#getEvents(this.hDate.add(1));
-  }
-
-  #getDailyZmanim(): DailyZmanim {
-    return new DailyZmanim(
-      this.date,
-      this.#geoLocation,
-      this.tzeitDeg,
-    );
-  }
-
   #getParshah(): ParshaEvent {
-    let parsha: ParshaEvent;
-    let check = this.hDate;
-    while (!(parsha = this.#getEvents(check).find(isParshaEvent)))
-      check = check.add(1);
-    return parsha;
+    return this.events.find(isParshaEvent)
   }
 
   // TODO: rosh hashannnah meshulash
@@ -359,13 +347,8 @@ export class HebCalDay {
     let check =
       this.isChag || this.isErevChag || this.isShabbat || this.isErevShabbat ? this.hDate.subtract(1)
     : this.hDate;
-    let lighting = this.#getEvents(check).find(isCandleLightingEvent);
-    let havdalah = this.#getEvents(check).find(isHavdalahEvent);
-    while (!lighting || !havdalah) {
-      check = check.add(1);
-      lighting ??= this.#getEvents(check).find(isCandleLightingEvent);
-      havdalah ??= this.#getEvents(check).find(isHavdalahEvent);
-    }
+    const lighting = this.#getEvents(check).find(isCandleLightingEvent);
+    const havdalah = this.#getEvents(check).find(isHavdalahEvent);
     const categories = lighting.getCategories();
     return {
       categories,

@@ -1,6 +1,6 @@
 import type { GeoLocation } from '@hebcal/noaa';
 
-import { Zmanim } from '@hebcal/core';
+import { type HDate, Zmanim } from '@hebcal/core';
 import { THREE_MEDIUM_STARS } from './constants.js';
 
 export type ZmanimKey = typeof DailyZmanim.ZMANIM_KEYS[number];
@@ -30,38 +30,15 @@ export class DailyZmanim {
     'tzeit',
   ] as const;
 
-  readonly alotHaShachar: Date;
-
-  readonly misheyakir: Date;
-
-  readonly sunrise: Date;
-
-  readonly sofZmanShmaMGA: Date;
-
-  readonly sofZmanShma: Date;
-
-  readonly sofZmanTfillaMGA: Date;
-
-  readonly sofZmanTfilla: Date;
-
-  readonly minchaGedola: Date;
-
-  readonly minchaKetana: Date;
-
-  readonly plagHaMincha: Date;
-
-  readonly sunset: Date;
-
-  readonly tzeit: Date;
-
   #keys = new Map<ZmanimKey, ZmanInfo>();
 
   constructor(
+    hDate: HDate,
     now: Date,
     geoLocation: GeoLocation,
     tzeitDeg = THREE_MEDIUM_STARS,
   ) {
-    const zmanim = new Zmanim(geoLocation, now, true);
+    const zmanim = new Zmanim(geoLocation, hDate, true);
     let lastSeenIsPast = false
     for (const key of DailyZmanim.ZMANIM_KEYS) {
       const date = zmanim[key](...key === 'tzeit' ? [tzeitDeg] : []);
