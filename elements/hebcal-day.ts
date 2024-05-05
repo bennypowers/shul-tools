@@ -139,7 +139,7 @@ export class HebcalDay extends LitElement {
 
   #getHebcalDay() {
     const {
-      date, debug,
+      debug,
       city, longitude, latitude, elevation, locale,
       tzeitDegrees,
       candleLightingMinutesBeforeSunset,
@@ -147,7 +147,7 @@ export class HebcalDay extends LitElement {
     const havdalahMins = this.havdalahMinutesAfterSunset || undefined;
     const havdalahDeg = this.havdalahDegrees || undefined;
     return new HebCalDay({
-      date,
+      date: this.specificDate,
       debug,
       city, locale,
       latitude, longitude, elevation,

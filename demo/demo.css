@@ -25,25 +25,6 @@ main {
 hebcal-day {
   margin-block: var(--root-gap);
   font-family: Alef, sans-serif;
-  display: grid;
-  row-gap: var(--hebcal-row-gap) var(--hebcal-column-gap);
-  align-content: start;
-  justify-items: center;
-  grid-template:
-    'date' auto
-    'analogue' auto
-    'yom' auto
-    'tefillah' min-content
-    'candles' auto
-    'foot' auto / auto;
-  @media (min-width: 768px) {
-    grid-template:
-      'analogue date'
-      'yom tefillah'
-      'yom candles'
-      'yom foot'
-      / auto auto;
-  }
 }
 
 hebcal-clock[type="digital"] {
