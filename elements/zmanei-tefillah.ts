@@ -29,9 +29,7 @@ export class ZmaneiTefillah extends HebcalDayConsumer {
       isRoshChodesh,
       isCholHamoed,
       isWeekday,
-      i18n: {
-        zmaneiTefillah,
-      }
+      i18n
     } = this.hayom;
 
     const openSlot =
@@ -43,7 +41,7 @@ export class ZmaneiTefillah extends HebcalDayConsumer {
       : 'error';
 
     return html`
-      <h2 id="heading">${zmaneiTefillah ?? ''}</h2>
+      <h2 id="heading">${i18n.get('zmaneiTefillah') ?? ''}</h2>
       <slot name="${openSlot}"></slot>
     `;
   }

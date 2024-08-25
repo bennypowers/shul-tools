@@ -26,20 +26,20 @@ export class ZmaneiShabbat extends HebcalDayConsumer {
 
     const locale = this.hayom.locale.substring(0, 1);
 
-    let desc = i18n.shabbat;
+    let desc = i18n.get('shabbat');
 
     // TODO: eruv tavshillin, etc
 
     if ((isChag || isErevChag))
-      desc += ` ${i18n.and}`;
+      desc += ` ${i18n.get('and')}`;
 
     if (isChag || isErevChag)
-      desc += i18n.chag;
+      desc += i18n.get('chag');
 
     return html`
       <slot>
         <h2>
-          <span>🍷 ${i18n.zmanei} ${desc}</span>
+          <span>🍷 ${i18n.get('zmanei')} ${desc}</span>
           <span part="parshah">📖 ${parsha?.render(locale) ?? ''}</span>
         </h2>
       </slot>

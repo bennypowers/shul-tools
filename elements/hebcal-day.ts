@@ -104,7 +104,6 @@ export class HebcalDay extends LitElement {
   @provide({ context })
   accessor hayom = this.#getHebcalDay();
 
-
   override render() {
     return html`
       <slot></slot>

@@ -1,0 +1,277 @@
+diff --git a/node_modules/@hebcal/core/dist/CalOptions.d.ts b/node_modules/@hebcal/core/dist/CalOptions.d.ts
+index 1940862..e4b6a79 100644
+--- a/node_modules/@hebcal/core/dist/CalOptions.d.ts
++++ b/node_modules/@hebcal/core/dist/CalOptions.d.ts
+@@ -1,5 +1,5 @@
+ import { HDate } from '@hebcal/hdate';
+-import { Location } from './location';
++import { Location } from './location.js';
+ export type DailyLearningValue = boolean | number | string;
+ /**
+  * Options to configure which events are returned
+diff --git a/node_modules/@hebcal/core/dist/DailyLearning.d.ts b/node_modules/@hebcal/core/dist/DailyLearning.d.ts
+index 5b48bc5..c6252cd 100644
+--- a/node_modules/@hebcal/core/dist/DailyLearning.d.ts
++++ b/node_modules/@hebcal/core/dist/DailyLearning.d.ts
+@@ -1,5 +1,5 @@
+ import { HDate } from '@hebcal/hdate';
+-import { Event } from './event';
++import { Event } from './event.js';
+ /**
+  * Plug-ins for daily learning calendars such as Daf Yomi, Mishna Yomi, Nach Yomi, etc.
+  *
+diff --git a/node_modules/@hebcal/core/dist/HebrewDateEvent.d.ts b/node_modules/@hebcal/core/dist/HebrewDateEvent.d.ts
+index 41f6c1c..1da5fe0 100644
+--- a/node_modules/@hebcal/core/dist/HebrewDateEvent.d.ts
++++ b/node_modules/@hebcal/core/dist/HebrewDateEvent.d.ts
+@@ -1,5 +1,5 @@
+ import { HDate } from '@hebcal/hdate';
+-import { Event } from './event';
++import { Event } from './event.js';
+ import './locale';
+ /** Daily Hebrew date ("11th of Sivan, 5780") */
+ export declare class HebrewDateEvent extends Event {
+diff --git a/node_modules/@hebcal/core/dist/HolidayEvent.d.ts b/node_modules/@hebcal/core/dist/HolidayEvent.d.ts
+index 8a2112a..b841308 100644
+--- a/node_modules/@hebcal/core/dist/HolidayEvent.d.ts
++++ b/node_modules/@hebcal/core/dist/HolidayEvent.d.ts
+@@ -1,6 +1,6 @@
+ import { HDate } from '@hebcal/hdate';
+-import { Event } from './event';
+-import { TimedEvent } from './TimedEvent';
++import { Event } from './event.js';
++import { TimedEvent } from './TimedEvent.js';
+ import './locale';
+ /** Represents a built-in holiday like Pesach, Purim or Tu BiShvat */
+ export declare class HolidayEvent extends Event {
+diff --git a/node_modules/@hebcal/core/dist/MevarchimChodeshEvent.d.ts b/node_modules/@hebcal/core/dist/MevarchimChodeshEvent.d.ts
+index 57dbf50..561d909 100644
+--- a/node_modules/@hebcal/core/dist/MevarchimChodeshEvent.d.ts
++++ b/node_modules/@hebcal/core/dist/MevarchimChodeshEvent.d.ts
+@@ -1,5 +1,5 @@
+ import { HDate } from '@hebcal/hdate';
+-import { Event } from './event';
++import { Event } from './event.js';
+ import './locale';
+ /** Represents Mevarchim haChodesh, the announcement of the new month */
+ export declare class MevarchimChodeshEvent extends Event {
+diff --git a/node_modules/@hebcal/core/dist/ParshaEvent.d.ts b/node_modules/@hebcal/core/dist/ParshaEvent.d.ts
+index c3cfc60..ca6e0d6 100644
+--- a/node_modules/@hebcal/core/dist/ParshaEvent.d.ts
++++ b/node_modules/@hebcal/core/dist/ParshaEvent.d.ts
+@@ -1,6 +1,6 @@
+-import { Event } from './event';
++import { Event } from './event.js';
+ import { HDate } from '@hebcal/hdate';
+-import './locale';
++import './locale.js';
+ /**
+  * Represents one of 54 weekly Torah portions, always on a Saturday
+  */
+diff --git a/node_modules/@hebcal/core/dist/TimedEvent.d.ts b/node_modules/@hebcal/core/dist/TimedEvent.d.ts
+index ab22889..7e2920c 100644
+--- a/node_modules/@hebcal/core/dist/TimedEvent.d.ts
++++ b/node_modules/@hebcal/core/dist/TimedEvent.d.ts
+@@ -1,8 +1,8 @@
+ import { HDate } from '@hebcal/hdate';
+-import { CalOptions } from './CalOptions';
+-import { Location } from './location';
+-import { Event } from './event';
+-import './locale';
++import { CalOptions } from './CalOptions.js';
++import { Location } from './location.js';
++import { Event } from './event.js';
++import './locale.js';
+ /** An event that has an `eventTime` and `eventTimeStr` */
+ export declare class TimedEvent extends Event {
+     readonly eventTime: Date;
+diff --git a/node_modules/@hebcal/core/dist/YomKippurKatanEvent.d.ts b/node_modules/@hebcal/core/dist/YomKippurKatanEvent.d.ts
+index a550114..ca65b95 100644
+--- a/node_modules/@hebcal/core/dist/YomKippurKatanEvent.d.ts
++++ b/node_modules/@hebcal/core/dist/YomKippurKatanEvent.d.ts
+@@ -1,6 +1,6 @@
+ import { HDate } from '@hebcal/hdate';
+-import { HolidayEvent } from './HolidayEvent';
+-import './locale';
++import { HolidayEvent } from './HolidayEvent.js';
++import './locale.js';
+ export declare const ykk = "Yom Kippur Katan";
+ /** YKK is minor day of atonement on the day preceeding each Rosh Chodesh */
+ export declare class YomKippurKatanEvent extends HolidayEvent {
+diff --git a/node_modules/@hebcal/core/dist/candles.d.ts b/node_modules/@hebcal/core/dist/candles.d.ts
+index cb203f3..3be0b3f 100644
+--- a/node_modules/@hebcal/core/dist/candles.d.ts
++++ b/node_modules/@hebcal/core/dist/candles.d.ts
+@@ -1,9 +1,9 @@
+ import { HDate } from '@hebcal/hdate';
+-import { CalOptions } from './CalOptions';
+-import { Location } from './location';
+-import { Event } from './event';
+-import { HolidayEvent } from './HolidayEvent';
+-import { TimedEvent } from './TimedEvent';
++import { CalOptions } from './CalOptions.js';
++import { Location } from './location.js';
++import { Event } from './event.js';
++import { HolidayEvent } from './HolidayEvent.js';
++import { TimedEvent } from './TimedEvent.js';
+ /**
+  * @private
+  */
+diff --git a/node_modules/@hebcal/core/dist/event.d.ts b/node_modules/@hebcal/core/dist/event.d.ts
+index 6be3a82..4c34927 100644
+--- a/node_modules/@hebcal/core/dist/event.d.ts
++++ b/node_modules/@hebcal/core/dist/event.d.ts
+@@ -1,5 +1,5 @@
+ import { HDate } from '@hebcal/hdate';
+-import './locale';
++import './locale.js';
+ /**
+  * Holiday flags for Event. These flags are typically
+  * combined using bitwise arithmetic to form a mask.
+diff --git a/node_modules/@hebcal/core/dist/getStartAndEnd.d.ts b/node_modules/@hebcal/core/dist/getStartAndEnd.d.ts
+index fffa7d6..3f501bd 100644
+--- a/node_modules/@hebcal/core/dist/getStartAndEnd.d.ts
++++ b/node_modules/@hebcal/core/dist/getStartAndEnd.d.ts
+@@ -1,4 +1,4 @@
+-import { CalOptions } from './CalOptions';
++import { CalOptions } from './CalOptions.js';
+ /**
+  * Parse options object to determine start & end days
+  * @private
+diff --git a/node_modules/@hebcal/core/dist/hallel.d.ts b/node_modules/@hebcal/core/dist/hallel.d.ts
+index 61b1db8..029ea41 100644
+--- a/node_modules/@hebcal/core/dist/hallel.d.ts
++++ b/node_modules/@hebcal/core/dist/hallel.d.ts
+@@ -1,5 +1,5 @@
+ import { HDate } from '@hebcal/hdate';
+-import { Event } from './event';
++import { Event } from './event.js';
+ /**
+  * @private
+  */
+diff --git a/node_modules/@hebcal/core/dist/hebcal.d.ts b/node_modules/@hebcal/core/dist/hebcal.d.ts
+index 8a12e5f..263169d 100644
+--- a/node_modules/@hebcal/core/dist/hebcal.d.ts
++++ b/node_modules/@hebcal/core/dist/hebcal.d.ts
+@@ -1,11 +1,11 @@
+ import { HDate } from '@hebcal/hdate';
+ import './locale';
+-import { CalOptions } from './CalOptions';
+-import { Event } from './event';
+-import { Sedra } from './sedra';
+-import { HolidayYearMap } from './holidays';
+-import { HolidayEvent } from './HolidayEvent';
+-import { TachanunResult } from './tachanun';
++import { CalOptions } from './CalOptions.js';
++import { Event } from './event.js';
++import { Sedra } from './sedra.js';
++import { HolidayYearMap } from './holidays.js';
++import { HolidayEvent } from './HolidayEvent.js';
++import { TachanunResult } from './tachanun.js';
+ /**
+  * HebrewCalendar is the main interface to the `@hebcal/core` library.
+  * This namespace is used to calculate holidays, rosh chodesh, candle lighting & havdalah times,
+diff --git a/node_modules/@hebcal/core/dist/holidays.d.ts b/node_modules/@hebcal/core/dist/holidays.d.ts
+index 799519b..5a6ce2f 100644
+--- a/node_modules/@hebcal/core/dist/holidays.d.ts
++++ b/node_modules/@hebcal/core/dist/holidays.d.ts
+@@ -1,4 +1,4 @@
+-import { HolidayEvent } from './HolidayEvent';
++import { HolidayEvent } from './HolidayEvent.js';
+ export type HolidayYearMap = Map<string, HolidayEvent[]>;
+ /**
+  * Lower-level holidays interface, which returns a `Map` of `Event`s indexed by
+diff --git a/node_modules/@hebcal/core/dist/index.d.ts b/node_modules/@hebcal/core/dist/index.d.ts
+index 852b085..26ed565 100644
+--- a/node_modules/@hebcal/core/dist/index.d.ts
++++ b/node_modules/@hebcal/core/dist/index.d.ts
+@@ -1,22 +1,22 @@
+ export { gematriya, gematriyaStrToNum } from '@hebcal/hdate';
+ export { greg, months, HDate, Locale, Headers, StringArrayMap, LocaleData, } from '@hebcal/hdate';
+ import './locale';
+-export { CalOptions, DailyLearningValue } from './CalOptions';
+-export { HebrewDateEvent } from './HebrewDateEvent';
+-export { Event, flags } from './event';
++export { CalOptions, DailyLearningValue } from './CalOptions.js';
++export { HebrewDateEvent } from './HebrewDateEvent.js';
++export { Event, flags } from './event.js';
+ export { GeoLocation, NOAACalculator } from '@hebcal/noaa';
+-export { Location } from './location';
+-export { Zmanim } from './zmanim';
+-export { TimedEvent, CandleLightingEvent, HavdalahEvent } from './TimedEvent';
+-export { Molad, MoladEvent } from './molad';
+-export { OmerEvent } from './omer';
+-export { TachanunResult } from './tachanun';
+-export { Sedra, SedraResult, parshiot } from './sedra';
+-export { ParshaEvent } from './ParshaEvent';
+-export { HolidayEvent, AsaraBTevetEvent, RoshChodeshEvent, RoshHashanaEvent, } from './HolidayEvent';
+-export { HolidayYearMap } from './holidays';
+-export { MevarchimChodeshEvent } from './MevarchimChodeshEvent';
+-export { holidayDesc } from './staticHolidays';
+-export { DailyLearning } from './DailyLearning';
+-export { HebrewCalendar } from './hebcal';
+-export { version } from './pkgVersion';
++export { Location } from './location.js';
++export { Zmanim } from './zmanim.js';
++export { TimedEvent, CandleLightingEvent, HavdalahEvent } from './TimedEvent.js';
++export { Molad, MoladEvent } from './molad.js';
++export { OmerEvent } from './omer.js';
++export { TachanunResult } from './tachanun.js';
++export { Sedra, SedraResult, parshiot } from './sedra.js';
++export { ParshaEvent } from './ParshaEvent.js';
++export { HolidayEvent, AsaraBTevetEvent, RoshChodeshEvent, RoshHashanaEvent, } from './HolidayEvent.js';
++export { HolidayYearMap } from './holidays.js';
++export { MevarchimChodeshEvent } from './MevarchimChodeshEvent.js';
++export { holidayDesc } from './staticHolidays.js';
++export { DailyLearning } from './DailyLearning.js';
++export { HebrewCalendar } from './hebcal.js';
++export { version } from './pkgVersion.js';
+diff --git a/node_modules/@hebcal/core/dist/molad.d.ts b/node_modules/@hebcal/core/dist/molad.d.ts
+index e73b664..5be4232 100644
+--- a/node_modules/@hebcal/core/dist/molad.d.ts
++++ b/node_modules/@hebcal/core/dist/molad.d.ts
+@@ -1,7 +1,7 @@
+-import { Event } from './event';
+-import { CalOptions } from './CalOptions';
++import { Event } from './event.js';
++import { CalOptions } from './CalOptions.js';
+ import { HDate } from '@hebcal/hdate';
+-import './locale';
++import './locale.js';
+ /**
+  * Represents a molad, the moment when the new moon is "born"
+  */
+diff --git a/node_modules/@hebcal/core/dist/omer.d.ts b/node_modules/@hebcal/core/dist/omer.d.ts
+index 0bbde66..69266d5 100644
+--- a/node_modules/@hebcal/core/dist/omer.d.ts
++++ b/node_modules/@hebcal/core/dist/omer.d.ts
+@@ -1,6 +1,6 @@
+ import { HDate } from '@hebcal/hdate';
+-import { Event } from './event';
+-import './locale';
++import { Event } from './event.js';
++import './locale.js';
+ /** Represents a day 1-49 of counting the Omer from Pesach to Shavuot */
+ export declare class OmerEvent extends Event {
+     private readonly weekNumber;
+diff --git a/node_modules/@hebcal/core/dist/reformatTimeStr.d.ts b/node_modules/@hebcal/core/dist/reformatTimeStr.d.ts
+index bd9b53e..5cf9902 100644
+--- a/node_modules/@hebcal/core/dist/reformatTimeStr.d.ts
++++ b/node_modules/@hebcal/core/dist/reformatTimeStr.d.ts
+@@ -1,4 +1,4 @@
+-import { CalOptions } from './CalOptions';
++import { CalOptions } from './CalOptions.js';
+ /**
+  * @private
+  * @param timeStr - original time like "20:30"
+diff --git a/node_modules/@hebcal/core/dist/sedra.d.ts b/node_modules/@hebcal/core/dist/sedra.d.ts
+index 6c69bff..9671946 100644
+--- a/node_modules/@hebcal/core/dist/sedra.d.ts
++++ b/node_modules/@hebcal/core/dist/sedra.d.ts
+@@ -1,5 +1,5 @@
+ import { HDate } from '@hebcal/hdate';
+-import './locale';
++import './locale.js';
+ /** The result from `Sedra.lookup()` */
+ export type SedraResult = {
+     /**

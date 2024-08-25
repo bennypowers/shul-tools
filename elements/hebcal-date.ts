@@ -18,7 +18,7 @@ export class HebcalDate extends HebcalDayConsumer {
   override render() {
     const { date, locale, hDate } = this.hayom;
 
-    const day = this.hayom.i18n.days[this.hayom.hDate.getDay()];
+    const day = this.hayom.i18n.get('days')[this.hayom.hDate.getDay()];
 
     const dateRendered =
         this.gematriya ? hDate.renderGematriya(true)

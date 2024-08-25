@@ -1,5 +1,7 @@
 {
-  "include": ["elements"],
+  "include": [
+    "elements"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "module": "NodeNext",
@@ -13,6 +15,21 @@
         "transform": "typescript-transform-lit-css",
         "inline": true
       }
+    ],
+    "lib": [
+      "DOM",
+      "DOM.iterable",
+      "DOM",
+      "es2015.iterable",
+      "es2020",
+      "es2022",
+      "ESNext.Disposable",
+      "ESNext.collection",
+      "ESNext.object",
+      "es5",
+      "es6",
+      "ScriptHost",
+      "esnext",
     ]
-  }
+  },
 }

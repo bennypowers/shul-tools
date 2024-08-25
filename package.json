@@ -55,20 +55,20 @@
     "elements"
   ],
   "devDependencies": {
-    "@hebcal/core": "^5.3.5",
-    "@parse5/tools": "^0.4.0",
+    "@hebcal/core": "^5.4.11",
+    "@parse5/tools": "^0.5.0",
     "@pwrs/eslint-config": "^0.0.26",
-    "@web/dev-server": "^0.4.4",
+    "@web/dev-server": "^0.4.6",
     "@web/dev-server-esbuild": "^1.0.2",
-    "@web/dev-server-import-maps": "^0.2.0",
-    "esbuild": "^0.20.2",
-    "eslint": "^8.56.0",
+    "@web/dev-server-import-maps": "^0.2.1",
+    "esbuild": "^0.23.1",
+    "eslint": "^9.9.1",
     "parse5": "^7.1.2",
-    "temporal-polyfill": "^0.2.4",
-    "ts-patch": "^3.1.2",
-    "tslib": "^2.6.2",
-    "typescript": "^5.4.5",
+    "temporal-polyfill": "^0.2.5",
+    "ts-patch": "^3.2.1",
+    "tslib": "^2.7.0",
+    "typescript": "^5.5.4",
     "typescript-transform-lit-css": "^2.0.0",
-    "wireit": "^0.14.4"
+    "wireit": "^0.14.8"
   }
 }

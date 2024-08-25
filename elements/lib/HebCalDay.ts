@@ -1,4 +1,5 @@
-import { DailyZmanim, ZmanimI18nKeys } from './DailyZmanim.js';
+import { I18n } from './I18n.js';
+import { DailyZmanim } from './DailyZmanim.js';
 import { GeoLocation } from '@hebcal/noaa';
 
 import {
@@ -17,16 +18,6 @@ import {
 import { THREE_SMALL_STARS } from './constants.js';
 
 import '@hebcal/learning';
-
-export interface I18nKeys extends ZmanimI18nKeys {
-  shabbat: string;
-  chag: string;
-  zmanei: string;
-  yom: string;
-  and: string;
-  zmaneiTefillah: string;
-  days: string[];
-}
 
 interface HebCalInitBase {
   debug?: boolean;
@@ -69,72 +60,7 @@ function isHavdalahEvent(x: HebCalEvent): x is HavdalahEvent {
 }
 
 export class HebCalDay {
-  static readonly i18n: Record<string, I18nKeys> = {
-    'he-IL': {
-      alotHaShachar: 'עלות השחר',
-      misheyakir: 'משיכיר',
-      sunrise: 'נץ',
-      sofZmanShmaMGA: 'סזק״ש (מג״א)',
-      sofZmanShma: 'סזק״ש (גר״א)',
-      sofZmanTfillaMGA: 'ס״ז תפילה (מג״א)',
-      sofZmanTfilla: 'ס״ז תפילה (גר״א)',
-      sunset: 'שקיעה',
-      minchaGedola: 'מנחה גדולה',
-      minchaKetana: 'מנחה קטנה',
-      plagHaMincha: 'פלג המנחה',
-      tzeit: 'צאת הכוכבים',
-      shabbat: 'שבת',
-      chag: 'יום טוב',
-      zmanei: 'זמני',
-      yom: 'יום',
-      and: 'ו',
-      zmaneiTefillah: 'זמני תפילה',
-      days: [
-        'יום ראשון',
-        'יום שני',
-        'יום שלישי',
-        'יום רביעי',
-        'יום חמישי',
-        'יום שישי',
-        'יום שבת קודש',
-      ]
-    },
-    'en-US': {
-      alotHaShachar: 'dawn',
-      misheyakir: 'misheyakir',
-      sunrise: 'sunrise',
-      sofZmanShmaMGA: 'Latest Shema (Gr"a)',
-      sofZmanShma: 'Latest Shema (Magen Avraham)',
-      sofZmanTfillaMGA: 'Latest Tefillah (Gr"a)',
-      sofZmanTfilla: 'Latest Tefillah (Magen Avraham)',
-      sunset: 'sunset',
-      minchaGedola: 'mincha gedola',
-      minchaKetana: 'mincha ketana',
-      plagHaMincha: 'plag hamincha',
-      tzeit: 'nightfall',
-      shabbat: 'Shabbat',
-      chag: 'Yom Tov',
-      zmanei: 'Halachic Times for',
-      yom: 'Today',
-      and: 'and ',
-      zmaneiTefillah: 'Prayer times',
-      days: [
-        'Sunday',
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Shabbat',
-      ]
-    }
-  }
-
-  static {
-    this.i18n.he = this.i18n['he-IL'];
-    this.i18n.en = this.i18n['en-US'];
-    this.i18n['en-GB'] = this.i18n['en-US'];
-  }
+  i18n: I18n;
 
   debug = false;
 
@@ -179,8 +105,6 @@ export class HebCalDay {
   readonly midnight: Date;
 
   readonly daf: HebCalEvent;
-
-  get i18n() { return HebCalDay.i18n[this.locale]; }
 
   get isShabbat() { return this.hDate.getDay() === 6; }
 
@@ -228,6 +152,7 @@ export class HebCalDay {
     this.midnight.setMilliseconds(0);
     this.timeParts = this.#getTimeParts();
     this.locale = options.locale ?? this.locale
+    this.i18n = new I18n(this.locale);
     this.latitude = options.latitude;
     this.longitude = options.longitude;
     this.elevation = options.elevation;
@@ -262,7 +187,7 @@ export class HebCalDay {
     this.eventsTomorrow = this.events.filter(x => x.getDate().isSameDate(this.hDate.add(1)));
     this.parsha = this.#getParshah();
     this.candles = this.#getCandles();
-    this.daf = DailyLearning.lookup('dafYomi', this.hDate);
+    this.daf = DailyLearning.lookup('dafYomi', this.hDate, this.locale.endsWith('IL'));
   }
 
   #getTimeParts() {
